@@ -1,26 +1,26 @@
-# Feature Specification: Orisha - Automated System Documentation Generator
+# Feature Specification: chronicle - Automated System Documentation Generator
 
-**Feature Branch**: `001-orisha-system-doc-generator`
+**Feature Branch**: `001-chronicle-system-doc-generator`
 **Created**: 2026-01-31
 **Status**: Draft
-**Input**: User description: "Create an automated system documentation generator for Enterprise IT audit, architecture, security and business stakeholders. Orisha runs in CI/CD pipelines to ensure documentation stays current as systems change. Uses deterministic analysis first (source code, Terraform, dependencies), then LLM to fill gaps and summarize sections in a template."
+**Input**: User description: "Create an automated system documentation generator for Enterprise IT audit, architecture, security and business stakeholders. chronicle runs in CI/CD pipelines to ensure documentation stays current as systems change. Uses deterministic analysis first (source code, Terraform, dependencies), then LLM to fill gaps and summarize sections in a template."
 
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Generate Documentation from Repository (Priority: P1)
 
-A DevOps engineer runs Orisha as part of their CI/CD pipeline to automatically generate up-to-date system documentation whenever code changes are merged.
+A DevOps engineer runs chronicle as part of their CI/CD pipeline to automatically generate up-to-date system documentation whenever code changes are merged.
 
 **Why this priority**: This is the core value proposition - automatically generating documentation that stays current with system changes, eliminating manual documentation maintenance.
 
-**Independent Test**: Can be fully tested by pointing Orisha at a sample repository and verifying it produces a complete documentation file with all detected components.
+**Independent Test**: Can be fully tested by pointing chronicle at a sample repository and verifying it produces a complete documentation file with all detected components.
 
 **Acceptance Scenarios**:
 
-1. **Given** a git repository with source code, **When** the user runs Orisha CLI, **Then** a documentation file is generated containing detected components
-2. **Given** a repository with Terraform files, **When** Orisha runs, **Then** the documentation includes cloud architecture diagrams
-3. **Given** a repository with dependency files (package.json, requirements.txt, go.mod), **When** Orisha runs, **Then** the documentation includes a technology stack section
-4. **Given** no LLM configuration is provided, **When** Orisha runs, **Then** deterministic analysis still produces useful documentation with placeholder summaries
+1. **Given** a git repository with source code, **When** the user runs chronicle CLI, **Then** a documentation file is generated containing detected components
+2. **Given** a repository with Terraform files, **When** chronicle runs, **Then** the documentation includes cloud architecture diagrams
+3. **Given** a repository with dependency files (package.json, requirements.txt, go.mod), **When** chronicle runs, **Then** the documentation includes a technology stack section
+4. **Given** no LLM configuration is provided, **When** chronicle runs, **Then** deterministic analysis still produces useful documentation with placeholder summaries
 
 ---
 
@@ -42,29 +42,29 @@ An IT auditor receives automatically generated system documentation that accurat
 
 ### User Story 3 - Configure LLM Backend for Summaries (Priority: P3) - IMPLEMENTED IN FOUNDATION
 
-> **Note**: This user story is addressed by foundational Phase 2 infrastructure (tasks T023e-T023j) via LiteLLM unified interface. User must select their LLM provider (Ollama, Claude, Gemini, or Bedrock) during `orisha init` - there is no default provider.
+> **Note**: This user story is addressed by foundational Phase 2 infrastructure (tasks T023e-T023j) via LiteLLM unified interface. User must select their LLM provider (Ollama, Claude, Gemini, or Bedrock) during `chronicle init` - there is no default provider.
 
-A security-conscious enterprise configures Orisha to use a local LLM (Ollama) to ensure no source code is sent to external services while still getting intelligent summaries.
+A security-conscious enterprise configures chronicle to use a local LLM (Ollama) to ensure no source code is sent to external services while still getting intelligent summaries.
 
 **Why this priority**: Enterprise security requirements often mandate local processing, making LLM backend flexibility essential for adoption.
 
 **Independent Test**: Can be tested by configuring different LLM backends and verifying summaries are generated without external network calls when using local LLM.
 
-**Implementation Status**: Complete via LiteLLM in `src/orisha/llm/client.py` with preflight validation in `src/orisha/utils/preflight.py`.
+**Implementation Status**: Complete via LiteLLM in `src/chronicle/llm/client.py` with preflight validation in `src/chronicle/utils/preflight.py`.
 
 **Acceptance Scenarios**:
 
-1. **Given** Orisha configured with Ollama, **When** documentation is generated, **Then** no network requests are made to external LLM services
-2. **Given** Orisha configured with Claude API, **When** documentation is generated, **Then** LLM summaries use the Claude service
-3. **Given** Orisha configured with Gemini API, **When** documentation is generated, **Then** LLM summaries use the Gemini service
-4. **Given** Orisha configured with AWS Bedrock, **When** documentation is generated, **Then** LLM summaries use the Bedrock service with detected AWS credentials
-5. **Given** invalid LLM configuration, **When** Orisha runs, **Then** a clear error message indicates the configuration issue
+1. **Given** chronicle configured with Ollama, **When** documentation is generated, **Then** no network requests are made to external LLM services
+2. **Given** chronicle configured with Claude API, **When** documentation is generated, **Then** LLM summaries use the Claude service
+3. **Given** chronicle configured with Gemini API, **When** documentation is generated, **Then** LLM summaries use the Gemini service
+4. **Given** chronicle configured with AWS Bedrock, **When** documentation is generated, **Then** LLM summaries use the Bedrock service with detected AWS credentials
+5. **Given** invalid LLM configuration, **When** chronicle runs, **Then** a clear error message indicates the configuration issue
 
 ---
 
 ### User Story 4 - Customize Documentation Template (Priority: P4)
 
-A technical writer customizes the documentation template to match their organization's documentation standards before running Orisha.
+A technical writer customizes the documentation template to match their organization's documentation standards before running chronicle.
 
 **Why this priority**: Template customization enables enterprises to align generated documentation with their existing documentation standards.
 
@@ -72,9 +72,9 @@ A technical writer customizes the documentation template to match their organiza
 
 **Acceptance Scenarios**:
 
-1. **Given** a custom Jinja2 template, **When** Orisha runs, **Then** output follows the custom template structure
-2. **Given** the default template, **When** Orisha runs, **Then** output follows the built-in template with all standard sections
-3. **Given** a template with unsupported placeholders, **When** Orisha runs, **Then** unsupported placeholders remain visible with warnings
+1. **Given** a custom Jinja2 template, **When** chronicle runs, **Then** output follows the custom template structure
+2. **Given** the default template, **When** chronicle runs, **Then** output follows the built-in template with all standard sections
+3. **Given** a template with unsupported placeholders, **When** chronicle runs, **Then** unsupported placeholders remain visible with warnings
 
 ---
 
@@ -97,12 +97,12 @@ A documentation manager exports generated documentation to different formats to 
 ### Edge Cases
 
 - What happens when the repository contains no recognizable source code or dependency files? System produces minimal documentation with warning indicating no analyzable content found
-- What happens when the user wants to augment the generated document to add clarity or insight? Human content is stored in separate markdown files (`.orisha/sections/*.md`) referenced in config, merged with generated content using prepend/append/replace strategies per section
+- What happens when the user wants to augment the generated document to add clarity or insight? Human content is stored in separate markdown files (`.chronicle/sections/*.md`) referenced in config, merged with generated content using prepend/append/replace strategies per section
 - What happens when the human input content conflicts with what the LLM summary states? User should be alerted of meaningful differences and told to address the conflicts before generating final document
 - How does the system handle corrupted or invalid dependency files? System skips invalid files with warnings, continues processing valid files
 - What happens when Terraform parsing fails? System logs error, continues without architecture diagram, notes absence in documentation
 - How does the system handle very large repositories? System processes incrementally without running out of memory, with progress indication
-- What happens when the LLM service is unavailable? Preflight check fails with clear error message and installation instructions. LLM is required for generating documentation summaries (provider configured via `orisha init`)
+- What happens when the LLM service is unavailable? Preflight check fails with clear error message and installation instructions. LLM is required for generating documentation summaries (provider configured via `chronicle init`)
 - How does the system handle binary files or non-text content? System skips binary files automatically without error
 - What happens when source code contains syntax errors? System uses best-effort parsing, notes parsing issues in output without failing
 
@@ -168,16 +168,16 @@ A documentation manager exports generated documentation to different formats to 
 - **SC-008**: System handles missing external tools and checks for them at startup and exits gracefully saying required tools are not detected
 - **SC-009**: Generated Markdown is valid and renders correctly in standard Markdown viewers
 - **SC-010**: LLM-generated summaries accurately reflect the deterministic analysis data (no hallucinated components)
-- **SC-011**: All documents generated must have a version history section, so it is clear when there are updates to it, along with a history so changes can be audited. Who made the change (Human or Orisha), on which date/time, pointing to which git repo to parse code from etc. should be clear with document template
+- **SC-011**: All documents generated must have a version history section, so it is clear when there are updates to it, along with a history so changes can be audited. Who made the change (Human or chronicle), on which date/time, pointing to which git repo to parse code from etc. should be clear with document template
 
 ## Assumptions
 
-- Syft is available as an external tool and installed on the system where Orisha runs
+- Syft is available as an external tool and installed on the system where chronicle runs
 - Terravision is available as an external tool for Terraform diagram generation
 - tree-sitter and tree-sitter-language-pack are installed for AST parsing
 - LiteLLM Python package is installed for unified LLM access
 - Repomix is required for codebase compression (install via `npm install -g repomix` or use `npx repomix`)
-- **LLM is REQUIRED**: User must select an LLM provider during `orisha init` (Ollama, Claude, Gemini, or AWS Bedrock). No default is assumed.
+- **LLM is REQUIRED**: User must select an LLM provider during `chronicle init` (Ollama, Claude, Gemini, or AWS Bedrock). No default is assumed.
 - If Ollama is selected, Ollama server must be running locally at http://localhost:11434
 - If Claude/Gemini is selected, valid API key must be configured
 - If AWS Bedrock is selected, valid AWS credentials must be available
@@ -200,22 +200,22 @@ A documentation manager exports generated documentation to different formats to 
 4. **Maintenance Burden**: Fallback code paths add complexity and are rarely as accurate as purpose-built tools
 
 **Implementation**:
-- `orisha check` validates ALL required dependencies before ANY analysis begins
+- `chronicle check` validates ALL required dependencies before ANY analysis begins
 - Missing dependencies cause immediate exit with exit code 1 and installation instructions
 - AST parsing requires tree-sitter (no regex fallback)
 - SBOM generation requires Syft (no custom parsing fallback)
 - Architecture diagrams require Terravision (no HCL regex fallback)
 - Codebase compression requires Repomix (no custom skeleton fallback)
-- LLM requires LiteLLM package + configured provider (Ollama, Claude, Gemini, or Bedrock - user must select during `orisha init`)
+- LLM requires LiteLLM package + configured provider (Ollama, Claude, Gemini, or Bedrock - user must select during `chronicle init`)
 - Users can skip specific analyzers via CLI flags (--skip-sbom, --skip-architecture) if tools are unavailable
 
 ### Source of Truth Precedence (Future Phases)
 
-**IMPORTANT**: When Orisha collects context from multiple sources, deterministic facts SHALL take precedence over descriptive text.
+**IMPORTANT**: When chronicle collects context from multiple sources, deterministic facts SHALL take precedence over descriptive text.
 
 **Precedence Order (highest to lowest)**:
 1. **Code Analysis**: AST parsing, import analysis, actual code structure
-2. **Structured Configuration**: YAML, JSON, TOML files (`.orisha/config.yaml`, `pyproject.toml`, `package.json`)
+2. **Structured Configuration**: YAML, JSON, TOML files (`.chronicle/config.yaml`, `pyproject.toml`, `package.json`)
 3. **Dependency Manifests**: Lock files, SBOM output from Syft
 4. **Descriptive Documentation**: Markdown files (README.md, docs/*.md)
 

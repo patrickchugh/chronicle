@@ -11,10 +11,16 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from orisha.config import CIConfig, LLMConfig, OrishaConfig, OutputConfig, ToolConfig
-from orisha.llm.prompts import PLACEHOLDER_SUMMARIES
-from orisha.models import Repository
-from orisha.models.analysis import (
+from chronicle.config import (
+    CIConfig,
+    LLMConfig,
+    chronicleConfig,
+    OutputConfig,
+    ToolConfig,
+)
+from chronicle.llm.prompts import PLACEHOLDER_SUMMARIES
+from chronicle.models import Repository
+from chronicle.models.analysis import (
     AnalysisResult,
     AnalysisStatus,
     Dependency,
@@ -22,16 +28,16 @@ from orisha.models.analysis import (
     LanguageInfo,
     TechnologyStack,
 )
-from orisha.pipeline import AnalysisPipeline, PipelineOptions
+from chronicle.pipeline import AnalysisPipeline, PipelineOptions
 
 
 class TestPipelineLLMSummarization:
     """Tests for LLM summarization in the pipeline."""
 
     @pytest.fixture
-    def mock_config(self) -> OrishaConfig:
-        """Create a real OrishaConfig with LLM enabled."""
-        config = OrishaConfig(
+    def mock_config(self) -> chronicleConfig:
+        """Create a real chronicleConfig with LLM enabled."""
+        config = chronicleConfig(
             output=OutputConfig(),
             tools=ToolConfig(),
             llm=LLMConfig(
@@ -71,7 +77,7 @@ class TestPipelineLLMSummarization:
         return mock
 
     def test_pipeline_skip_llm_uses_placeholders(
-        self, mock_config: OrishaConfig, mock_repository: Repository
+        self, mock_config: chronicleConfig, mock_repository: Repository
     ) -> None:
         """Test that --skip-llm flag applies placeholder summaries."""
         pipeline = AnalysisPipeline(config=mock_config)
@@ -102,7 +108,7 @@ class TestPipelineLLMSummarization:
     ) -> None:
         """Test that disabled LLM config applies placeholder summaries."""
         # Create config with LLM disabled
-        config = OrishaConfig(
+        config = chronicleConfig(
             output=OutputConfig(),
             tools=ToolConfig(),
             llm=LLMConfig(
@@ -132,7 +138,7 @@ class TestPipelineLLMSummarization:
 
     def test_pipeline_generates_llm_summaries(
         self,
-        mock_config: OrishaConfig,
+        mock_config: chronicleConfig,
         mock_repository: Repository,
         mock_llm_response: MagicMock,
     ) -> None:
@@ -184,7 +190,7 @@ class TestPipelineLLMSummarization:
 
     def test_pipeline_llm_failure_marks_failed_status(
         self,
-        mock_config: OrishaConfig,
+        mock_config: chronicleConfig,
         mock_repository: Repository,
     ) -> None:
         """Test pipeline marks failed status when LLM check_available fails."""
@@ -213,7 +219,7 @@ class TestPipelineLLMSummarization:
 
     def test_pipeline_llm_partial_subsection_failure_still_produces_content(
         self,
-        mock_config: OrishaConfig,
+        mock_config: chronicleConfig,
         mock_repository: Repository,
     ) -> None:
         """Test that partial sub-section failures still produce content.
@@ -250,7 +256,9 @@ class TestPipelineLLMSummarization:
                 )
             ]
             mock.model = "claude-3-sonnet-20240229"
-            mock.usage = MagicMock(prompt_tokens=50, completion_tokens=20, total_tokens=70)
+            mock.usage = MagicMock(
+                prompt_tokens=50, completion_tokens=20, total_tokens=70
+            )
             return mock
 
         with patch("litellm.completion", side_effect=mock_completion_with_failure):
@@ -264,7 +272,7 @@ class TestPipelineLLMSummarization:
 
     def test_pipeline_llm_all_subsections_fail_uses_placeholder(
         self,
-        mock_config: OrishaConfig,
+        mock_config: chronicleConfig,
         mock_repository: Repository,
     ) -> None:
         """Test that when ALL sub-sections of a section fail, placeholder is used."""
@@ -297,10 +305,14 @@ class TestPipelineLLMSummarization:
                 )
             ]
             mock.model = "claude-3-sonnet-20240229"
-            mock.usage = MagicMock(prompt_tokens=50, completion_tokens=20, total_tokens=70)
+            mock.usage = MagicMock(
+                prompt_tokens=50, completion_tokens=20, total_tokens=70
+            )
             return mock
 
-        with patch("litellm.completion", side_effect=mock_completion_all_overview_fails):
+        with patch(
+            "litellm.completion", side_effect=mock_completion_all_overview_fails
+        ):
             result = pipeline.run(mock_repository, options)
 
         # Overview should be placeholder since ALL sub-sections failed
@@ -310,7 +322,7 @@ class TestPipelineLLMSummarization:
 
     def test_pipeline_verbose_llm_logs_facts_and_responses(
         self,
-        mock_config: OrishaConfig,
+        mock_config: chronicleConfig,
         mock_repository: Repository,
         mock_llm_response: MagicMock,
         caplog: pytest.LogCaptureFixture,
@@ -335,7 +347,7 @@ class TestPipelineLLMSummarization:
             verbose_llm=True,  # Enable verbose LLM logging
         )
 
-        with caplog.at_level(logging.DEBUG, logger="orisha.llm.client"):
+        with caplog.at_level(logging.DEBUG, logger="chronicle.llm.client"):
             with patch("litellm.completion", return_value=mock_llm_response):
                 pipeline.run(mock_repository, options)
 
@@ -350,7 +362,7 @@ class TestPipelineLLMSummarization:
 
     def test_pipeline_llm_output_is_concatenation_of_subsections(
         self,
-        mock_config: OrishaConfig,
+        mock_config: chronicleConfig,
         mock_repository: Repository,
     ) -> None:
         """Test that final output is concatenation of sub-section answers (T065ad).
@@ -406,7 +418,9 @@ class TestPipelineLLMSummarization:
                 )
             ]
             mock.model = "claude-3-sonnet-20240229"
-            mock.usage = MagicMock(prompt_tokens=50, completion_tokens=20, total_tokens=70)
+            mock.usage = MagicMock(
+                prompt_tokens=50, completion_tokens=20, total_tokens=70
+            )
             return mock
 
         with patch("litellm.completion", side_effect=mock_completion_unique_responses):
@@ -462,8 +476,12 @@ class TestPipelineLLMWithFullAnalysis:
                 Framework(name="React", version="18.2"),
             ],
             dependencies=[
-                Dependency(name="pytest", ecosystem="pypi", source_file="pyproject.toml"),
-                Dependency(name="boto3", ecosystem="pypi", source_file="pyproject.toml"),
+                Dependency(
+                    name="pytest", ecosystem="pypi", source_file="pyproject.toml"
+                ),
+                Dependency(
+                    name="boto3", ecosystem="pypi", source_file="pyproject.toml"
+                ),
                 Dependency(name="react", ecosystem="npm", source_file="package.json"),
             ],
         )
@@ -518,7 +536,7 @@ class TestPipelineLLMErrorMessages:
         """Test help message for unknown provider."""
         pipeline = AnalysisPipeline()
         msg = pipeline._get_llm_help_message("unknown")
-        assert "orisha init" in msg
+        assert "chronicle init" in msg
 
 
 class TestLLMSummariesInResult:

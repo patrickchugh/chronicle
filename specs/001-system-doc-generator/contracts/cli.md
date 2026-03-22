@@ -1,4 +1,4 @@
-# CLI Contract: Orisha
+# CLI Contract: chronicle
 
 **Date**: 2026-01-31
 **Branch**: `001-system-doc-generator`
@@ -6,7 +6,7 @@
 ## Command Structure
 
 ```
-orisha [OPTIONS] COMMAND [ARGS]
+chronicle [OPTIONS] COMMAND [ARGS]
 ```
 
 ## Global Options
@@ -23,12 +23,12 @@ orisha [OPTIONS] COMMAND [ARGS]
 
 ## Commands
 
-### `orisha write`
+### `chronicle write`
 
 Write system documentation for a repository.
 
 ```
-orisha write [OPTIONS] [REPOSITORY]
+chronicle write [OPTIONS] [REPOSITORY]
 ```
 
 #### Arguments
@@ -58,24 +58,24 @@ orisha write [OPTIONS] [REPOSITORY]
 #### Examples
 
 ```bash
-# Write docs using settings from .orisha/config.yaml
-orisha write
+# Write docs using settings from .chronicle/config.yaml
+chronicle write
 
 # Override output path for this run
-orisha write --output ./docs/architecture.md
+chronicle write --output ./docs/architecture.md
 
 # CI/CD mode (uses config.yaml for all settings)
-orisha write --ci
+chronicle write --ci
 ```
 
 ---
 
-### `orisha check`
+### `chronicle check`
 
 Verify external tool availability and configuration.
 
 ```
-orisha check [OPTIONS]
+chronicle check [OPTIONS]
 ```
 
 #### Options
@@ -120,12 +120,12 @@ orisha check [OPTIONS]
 
 ---
 
-### `orisha init`
+### `chronicle init`
 
-Initialize Orisha configuration for a repository with interactive LLM provider setup.
+Initialize chronicle configuration for a repository with interactive LLM provider setup.
 
 ```
-orisha init [OPTIONS]
+chronicle init [OPTIONS]
 ```
 
 #### Options
@@ -142,12 +142,12 @@ When run interactively (default), the command prompts:
 1. **LLM Provider Selection**: User must choose Ollama, Claude, Gemini, or AWS Bedrock (no default)
 2. **Credential Input**: Provider-specific credentials (API key or AWS credentials)
 3. **Connectivity Test**: Validates provider connectivity/credentials
-4. **Configuration Save**: Writes settings to `.orisha/config.yaml`
+4. **Configuration Save**: Writes settings to `.chronicle/config.yaml`
 
 ```
-$ orisha init
+$ chronicle init
 
-Initializing Orisha configuration...
+Initializing chronicle configuration...
 
 Select LLM provider:
   [1] Ollama (local - no data leaves machine)
@@ -165,29 +165,29 @@ Enter AWS region [us-east-1]: us-west-2
 Enter Bedrock model ID [anthropic.claude-3-sonnet-20240229-v1:0]:
 ✓ AWS credentials detected
 
-Created .orisha/config.yaml
+Created .chronicle/config.yaml
 LLM provider: claude (claude-3-5-sonnet-20241022)
 
-Run 'orisha check' to verify all dependencies.
+Run 'chronicle check' to verify all dependencies.
 ```
 
 #### Behavior
 
-Creates `.orisha/config.yaml` with:
+Creates `.chronicle/config.yaml` with:
 - Selected LLM provider and credentials
 - Default output settings (./docs/system.md, markdown format)
 - Default tool configuration (syft, terravision)
 
-With `--non-interactive`, requires `--provider` flag or `ORISHA_LLM_PROVIDER` environment variable (no default).
+With `--non-interactive`, requires `--provider` flag or `chronicle_LLM_PROVIDER` environment variable (no default).
 
 ---
 
-### `orisha validate`
+### `chronicle validate`
 
 Validate a documentation template.
 
 ```
-orisha validate TEMPLATE
+chronicle validate TEMPLATE
 ```
 
 #### Arguments
@@ -208,7 +208,7 @@ orisha validate TEMPLATE
 
 ## Configuration File Schema
 
-### orisha.yaml
+### chronicle.yaml
 
 ```yaml
 # Output settings
@@ -229,10 +229,10 @@ tools:
 # Reference markdown files to merge with generated content
 sections:
   overview:
-    file: ".orisha/sections/overview.md"
+    file: ".chronicle/sections/overview.md"
     strategy: "prepend"        # prepend | append | replace
   security:
-    file: ".orisha/sections/security.md"
+    file: ".chronicle/sections/security.md"
     strategy: "append"
 
 # LLM settings (optional - works without LLM)
@@ -265,7 +265,7 @@ ci:
 | `AWS_REGION` | AWS region for Bedrock (default: us-east-1) | LLM (bedrock) |
 | `AWS_PROFILE` | AWS profile name (alternative to keys) | LLM (bedrock) |
 | `CI` | Set to "true" in CI environments | Auto-enable CI mode |
-| `ORISHA_CONFIG` | Override config file path | Configuration loading |
+| `chronicle_CONFIG` | Override config file path | Configuration loading |
 
 ---
 

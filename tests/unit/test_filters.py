@@ -2,7 +2,7 @@
 
 import pytest
 
-from orisha.renderers.filters import (
+from chronicle.renderers.filters import (
     NEGATIVE_PATTERNS,
     is_empty_section,
     replace_negative_assertions,

@@ -1,7 +1,7 @@
 [project]
 name = "sample-python-project"
 version = "0.1.0"
-description = "A sample Python project for Orisha testing"
+description = "A sample Python project for chronicle testing"
 requires-python = ">=3.11"
 dependencies = [
     "flask>=2.3.0",

@@ -1,4 +1,4 @@
-"""Shared pytest fixtures for Orisha tests.
+"""Shared pytest fixtures for chronicle tests.
 
 This module provides common fixtures used across unit, integration, and
 contract tests. Fixtures are organized by category:
@@ -53,8 +53,8 @@ def temp_repo(tmp_path: Path) -> Path:
 
 @pytest.fixture
 def temp_config_dir(tmp_path: Path) -> Path:
-    """Create a temporary .orisha configuration directory."""
-    config_dir = tmp_path / ".orisha"
+    """Create a temporary .chronicle configuration directory."""
+    config_dir = tmp_path / ".chronicle"
     config_dir.mkdir()
     sections_dir = config_dir / "sections"
     sections_dir.mkdir()
@@ -68,7 +68,7 @@ def temp_config_dir(tmp_path: Path) -> Path:
 
 @pytest.fixture
 def minimal_config() -> dict[str, Any]:
-    """Return a minimal valid Orisha configuration."""
+    """Return a minimal valid chronicle configuration."""
     return {
         "output": {
             "path": "docs/SYSTEM.md",
@@ -79,7 +79,7 @@ def minimal_config() -> dict[str, Any]:
 
 @pytest.fixture
 def full_config() -> dict[str, Any]:
-    """Return a complete Orisha configuration with all options."""
+    """Return a complete chronicle configuration with all options."""
     return {
         "output": {
             "path": "docs/SYSTEM.md",
@@ -99,11 +99,11 @@ def full_config() -> dict[str, Any]:
         },
         "sections": {
             "overview": {
-                "file": ".orisha/sections/overview.md",
+                "file": ".chronicle/sections/overview.md",
                 "strategy": "prepend",
             },
             "security": {
-                "file": ".orisha/sections/security.md",
+                "file": ".chronicle/sections/security.md",
                 "strategy": "append",
             },
         },
@@ -155,7 +155,7 @@ if __name__ == "__main__":
 @pytest.fixture
 def javascript_source() -> str:
     """Return sample JavaScript source code for AST parsing tests."""
-    return '''/**
+    return """/**
  * Sample module for testing.
  */
 
@@ -178,13 +178,13 @@ function main() {
 }
 
 module.exports = { UserService, main };
-'''
+"""
 
 
 @pytest.fixture
 def typescript_source() -> str:
     """Return sample TypeScript source code for AST parsing tests."""
-    return '''/**
+    return """/**
  * Sample module for testing.
  */
 
@@ -214,7 +214,7 @@ function main(): void {
 }
 
 export { UserService, main };
-'''
+"""
 
 
 # =============================================================================
@@ -225,7 +225,7 @@ export { UserService, main };
 @pytest.fixture
 def package_json() -> str:
     """Return sample package.json content."""
-    return '''{
+    return """{
   "name": "sample-project",
   "version": "1.0.0",
   "dependencies": {
@@ -236,26 +236,26 @@ def package_json() -> str:
     "jest": "^29.0.0",
     "typescript": "^5.0.0"
   }
-}'''
+}"""
 
 
 @pytest.fixture
 def requirements_txt() -> str:
     """Return sample requirements.txt content."""
-    return '''# Production dependencies
+    return """# Production dependencies
 fastapi>=0.100.0
 uvicorn>=0.23.0
 pydantic>=2.0.0
 
 # Optional dependencies
 redis>=4.0.0
-'''
+"""
 
 
 @pytest.fixture
 def pyproject_toml() -> str:
     """Return sample pyproject.toml content."""
-    return '''[project]
+    return """[project]
 name = "sample-project"
 version = "1.0.0"
 dependencies = [
@@ -268,4 +268,4 @@ dev = [
     "pytest>=8.0.0",
     "ruff>=0.1.0",
 ]
-'''
+"""

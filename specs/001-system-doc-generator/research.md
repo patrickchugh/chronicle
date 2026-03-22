@@ -1,4 +1,4 @@
-# Research: Orisha - Automated System Documentation Generator
+# Research: chronicle - Automated System Documentation Generator
 
 **Date**: 2026-01-31
 **Branch**: `001-system-doc-generator`
@@ -586,12 +586,12 @@ git diff --name-only <cached_git_ref>  # includes HEAD + working tree
 ### Rationale
 1. **Fast** - Git already indexes the working tree, no file I/O needed
 2. **Includes uncommitted changes** - `git diff HEAD` shows modified files in working tree
-3. **Already required** - Orisha requires git repos anyway (for git_ref tracking)
+3. **Already required** - chronicle requires git repos anyway (for git_ref tracking)
 4. **Deterministic** - Same working tree state = same diff output
 
 ### Fallback for Non-Git Repos
 If not a git repo, fall back to full regeneration (no caching). This is acceptable since:
-- Orisha already warns when not in a git repo
+- chronicle already warns when not in a git repo
 - Non-git usage is rare edge case
 - Constitution Principle II (Reproducibility) requires git_ref anyway
 
@@ -621,7 +621,7 @@ Use **File-level cache with function storage**:
 
 ### Decision
 Invalidate entire cache when ANY of these change:
-1. **Orisha version** - LLM prompts may have changed
+1. **chronicle version** - LLM prompts may have changed
 2. **LLM model** - Different model = different explanations
 3. **Cache format version** - Incompatible cache structure
 
@@ -645,7 +645,7 @@ Invalidate entire cache when ANY of these change:
 
 ### LLM Call Reduction
 
-For Orisha codebase (42 functions, 158 classes = 200 items):
+For chronicle codebase (42 functions, 158 classes = 200 items):
 
 | Scenario | Without Cache | With Cache | Savings |
 |----------|--------------|------------|---------|
@@ -663,9 +663,9 @@ For Orisha codebase (42 functions, 158 classes = 200 items):
 | Change Detection | Git-based (`git diff --name-only`) |
 | Cache Key | `git_ref` when cache was created |
 | Storage Key | `file_path:line:name` for explanations |
-| Invalidation | On Orisha version, LLM model, or cache format change |
+| Invalidation | On chronicle version, LLM model, or cache format change |
 | File Granularity | Invalidate all functions in changed files |
-| Cache Location | `.orisha/cache.json` (committable or gitignored) |
+| Cache Location | `.chronicle/cache.json` (committable or gitignored) |
 | Non-git Fallback | Full regeneration (no caching) |
 
 ---
@@ -745,7 +745,7 @@ Detect modules at the **package/directory level** and generate one LLM summary p
 Instead of asking about individual functions, ask:
 ```
 Given this module's structure:
-- Module: src/orisha/analyzers/
+- Module: src/chronicle/analyzers/
 - Files: ast_parser.py, dependency.py, sbom/syft.py
 - Key classes: ASTParser, DependencyParser, SyftAdapter
 - Key functions: parse_python_ast, extract_dependencies
@@ -822,9 +822,9 @@ Document only **entry points** (public interfaces) rather than all functions.
 
 | Entry Point | Type | Location | Description |
 |-------------|------|----------|-------------|
-| `orisha write` | CLI | cli.py:45 | Generate documentation |
-| `orisha check` | CLI | cli.py:78 | Validate tool availability |
-| `orisha init` | CLI | cli.py:92 | Initialize configuration |
+| `chronicle write` | CLI | cli.py:45 | Generate documentation |
+| `chronicle check` | CLI | cli.py:78 | Validate tool availability |
+| `chronicle init` | CLI | cli.py:92 | Initialize configuration |
 ```
 
 ### What NOT to Document
@@ -1048,7 +1048,7 @@ DEFAULT_EXCLUDE = [
 ]
 ```
 
-### Usage in Orisha Pipeline
+### Usage in chronicle Pipeline
 
 1. **New Stage**: Add Repomix compression as Stage 1b (after preflight, before AST parsing)
 2. **Single LLM Call**: Send compressed codebase for holistic overview
@@ -1073,7 +1073,7 @@ DEFAULT_EXCLUDE = [
 ### Prerequisites
 
 - Node.js (for npx) or install via: `npm install -g repomix`
-- **REQUIRED**: Added to Orisha preflight check - fails if unavailable (like Syft, tree-sitter)
+- **REQUIRED**: Added to chronicle preflight check - fails if unavailable (like Syft, tree-sitter)
 
 ---
 

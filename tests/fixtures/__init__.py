@@ -1,4 +1,4 @@
-"""Test fixtures for Orisha.
+"""Test fixtures for chronicle.
 
 This package provides sample repositories and other test fixtures
 for integration and end-to-end testing.

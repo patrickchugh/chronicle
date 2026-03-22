@@ -4,8 +4,8 @@
   Version change: 1.3.0 → 1.4.0 (LLM required, user must select provider)
 
   Modified principles:
-  - I. Deterministic-First: LLM is REQUIRED. User must select provider during orisha init (no default).
-  - III. Preflight Validation: LLM provider must be configured via orisha init before use.
+  - I. Deterministic-First: LLM is REQUIRED. User must select provider during chronicle init (no default).
+  - III. Preflight Validation: LLM provider must be configured via chronicle init before use.
 
   Added principles: None
 
@@ -23,14 +23,14 @@
   Dependent artifacts to update:
   - specs/001-system-doc-generator/spec.md ✅ (LLM assumptions updated, no default)
   - specs/001-system-doc-generator/tasks.md ✅ (LLM in Phase 2 foundational)
-  - specs/001-system-doc-generator/contracts/cli.md ✅ (orisha init requires provider selection)
-  - src/orisha/config.py (LLM provider must be configured, no default)
-  - src/orisha/utils/preflight.py ✅ (LLM check added)
+  - specs/001-system-doc-generator/contracts/cli.md ✅ (chronicle init requires provider selection)
+  - src/chronicle/config.py (LLM provider must be configured, no default)
+  - src/chronicle/utils/preflight.py ✅ (LLM check added)
 
   Follow-up TODOs: None - all artifacts aligned
 -->
 
-# Orisha Constitution
+# chronicle Constitution
 
 ## Core Principles
 
@@ -44,13 +44,13 @@ All analysis MUST be performed using deterministic methods before any LLM invoca
 - LLM is REQUIRED for generating human-readable documentation summaries (deterministic analysis produces structured data, LLM produces prose)
 - LLM transforms deterministic data into readable documentation; it never replaces the underlying analysis
 - If deterministic analysis fails for a component, that failure MUST be documented in output rather than masked by LLM-generated content
-- LLM provider must be selected during `orisha init` (Ollama, Claude, Gemini, or AWS Bedrock). No default - user must explicitly choose based on their security and infrastructure requirements
+- LLM provider must be selected during `chronicle init` (Ollama, Claude, Gemini, or AWS Bedrock). No default - user must explicitly choose based on their security and infrastructure requirements
 
-**Rationale**: Deterministic analysis is auditable, reproducible, and verifiable. LLM output cannot be independently verified without the underlying deterministic data. Ollama option enables security-conscious enterprises to use Orisha without sending code to external services.
+**Rationale**: Deterministic analysis is auditable, reproducible, and verifiable. LLM output cannot be independently verified without the underlying deterministic data. Ollama option enables security-conscious enterprises to use chronicle without sending code to external services.
 
 ### II. Reproducibility
 
-Given the same input repository state, Orisha MUST produce semantically identical output.
+Given the same input repository state, chronicle MUST produce semantically identical output.
 
 - All LLM calls MUST use `temperature=0` and other appropriate deterministic hyperparameters e.g. Top K etc
 - Output documents MUST include version history with timestamps, git refs, and author attribution
@@ -64,15 +64,15 @@ Given the same input repository state, Orisha MUST produce semantically identica
 
 All external dependencies MUST be validated before analysis begins, not during processing.
 
-- The `orisha check` command MUST verify availability of ALL required tools:
+- The `chronicle check` command MUST verify availability of ALL required tools:
   - git (version control)
   - tree-sitter + tree-sitter-language-pack (AST parsing)
   - Syft (SBOM generation)
   - Terravision + Graphviz (architecture diagrams)
   - LiteLLM (unified LLM interface)
-  - LLM provider configured via `orisha init`: Ollama (local server), Claude/Gemini (API key), or Bedrock (AWS credentials)
+  - LLM provider configured via `chronicle init`: Ollama (local server), Claude/Gemini (API key), or Bedrock (AWS credentials)
 - Missing required tools MUST cause immediate exit with clear error message and installation instructions
-- LLM is REQUIRED: User must configure provider via `orisha init`. Ollama requires local server, Claude/Gemini require API keys, Bedrock requires AWS credentials
+- LLM is REQUIRED: User must configure provider via `chronicle init`. Ollama requires local server, Claude/Gemini require API keys, Bedrock requires AWS credentials
 - No partial documentation: either all prerequisites pass and full docs are generated, or processing fails fast
 - Users can skip specific analyzers via CLI flags (--skip-sbom, --skip-architecture) if tools are unavailable
 
@@ -80,7 +80,7 @@ All external dependencies MUST be validated before analysis begins, not during p
 
 ### IV. CI/CD Compatibility
 
-Orisha MUST operate as a well-behaved CLI tool in automated environments.
+chronicle MUST operate as a well-behaved CLI tool in automated environments.
 
 - No interactive prompts: all configuration via CLI args, config files, or environment variables
 - Exit codes MUST be meaningful: 0 = success, 1 = error, 2 = warnings
@@ -89,11 +89,11 @@ Orisha MUST operate as a well-behaved CLI tool in automated environments.
 - Timeout handling: long-running operations MUST respect configurable timeouts
 - Environment variable substitution MUST be supported in config files (e.g., `${ANTHROPIC_API_KEY}`)
 
-**Rationale**: Orisha runs unattended in CI/CD pipelines. It must integrate cleanly with existing automation infrastructure without special handling.
+**Rationale**: chronicle runs unattended in CI/CD pipelines. It must integrate cleanly with existing automation infrastructure without special handling.
 
 ### V. Tool Agnosticism
 
-Orisha MUST support pluggable tools for each analysis capability, enabling users to swap implementations.
+chronicle MUST support pluggable tools for each analysis capability, enabling users to swap implementations.
 
 - Each analysis capability (SBOM, diagrams, AST parsing) MUST be abstracted behind a common interface
 - Tool configuration MUST be explicit in config files, not hardcoded (e.g., `sbom_tool: syft` or `sbom_tool: trivy`)
@@ -112,11 +112,11 @@ Orisha MUST support pluggable tools for each analysis capability, enabling users
 User-provided content MUST be mergeable with generated documentation.
 
 - Human sections MUST be defined in YAML config referencing markdown files
-- Human markdown files (`.orisha/sections/*.md`) MUST be merged with generated content
+- Human markdown files (`.chronicle/sections/*.md`) MUST be merged with generated content
 - Merge strategies (prepend, append, replace) MUST be configurable per section
-- Human content files MUST NOT be modified by Orisha—they are user-owned
-- Version history MUST distinguish between human-authored and Orisha-generated changes
-- If a referenced section file is missing, Orisha MUST warn and continue without it
+- Human content files MUST NOT be modified by chronicle—they are user-owned
+- Version history MUST distinguish between human-authored and chronicle-generated changes
+- If a referenced section file is missing, chronicle MUST warn and continue without it
 
 **Rationale**: Documentation often requires human insight that cannot be derived from code analysis. File-based sections keep human content cleanly separated and easy to edit.
 
@@ -127,13 +127,13 @@ These gates apply to all implementations and MUST be checked before merging:
 | Gate | Requirement | Enforcement |
 |------|-------------|-------------|
 | Deterministic Analysis | All new analyzers MUST produce identical output for identical input | Unit test with fixture comparison |
-| Preflight Check | New external dependencies MUST be added to `orisha check` | Integration test verifies check coverage |
+| Preflight Check | New external dependencies MUST be added to `chronicle check` | Integration test verifies check coverage |
 | Exit Codes | All error paths MUST set appropriate exit codes | CLI integration tests |
 | No Interactive Prompts | All user input MUST come from args/config/env | CI test runs with `--ci` flag |
 | Reproducibility | Two consecutive runs on same repo MUST produce semantically identical output | Integration test with diff analysis |
 | Tool Abstraction | New tool integrations MUST implement capability interface | Interface compliance tests |
 | Canonical Format Compliance | All adapters MUST output validated canonical types; no tool-specific data escapes adapters | Unit tests verify schema conformance |
-| LLM Required | LLM provider must be configured via `orisha init` and produce valid summaries | Preflight check + integration test |
+| LLM Required | LLM provider must be configured via `chronicle init` and produce valid summaries | Preflight check + integration test |
 | Section Merging | Human sections from config MUST merge correctly with generated content | Integration test with section files |
 
 ## Development Workflow
@@ -160,7 +160,7 @@ These gates apply to all implementations and MUST be checked before merging:
 
 ## Governance
 
-This constitution supersedes all other development practices for the Orisha project.
+This constitution supersedes all other development practices for the chronicle project.
 
 - **Amendments**: Changes to Core Principles require documentation of rationale and migration plan
 - **Compliance**: All PRs and code reviews MUST verify adherence to Core Principles

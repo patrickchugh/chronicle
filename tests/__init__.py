@@ -1,1 +1,1 @@
-"""Orisha test suite."""
+"""chronicle test suite."""

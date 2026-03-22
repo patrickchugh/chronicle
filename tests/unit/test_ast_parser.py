@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from orisha.analyzers.ast_parser import ASTParser
+from chronicle.analyzers.ast_parser import ASTParser
 
 
 class TestASTParser:
@@ -18,7 +18,8 @@ class TestASTParser:
     def test_parse_python_file(self, parser: ASTParser, tmp_path: Path) -> None:
         """Test parsing a Python file."""
         py_file = tmp_path / "test.py"
-        py_file.write_text('''
+        py_file.write_text(
+            '''
 """Test module."""
 
 class TestClass:
@@ -33,7 +34,8 @@ def top_level_function(x: int, y: int) -> int:
 
 async def async_function():
     pass
-''')
+'''
+        )
 
         result = parser.parse_file(py_file)
 
@@ -46,7 +48,8 @@ async def async_function():
     def test_parse_javascript_file(self, parser: ASTParser, tmp_path: Path) -> None:
         """Test parsing a JavaScript file."""
         js_file = tmp_path / "test.js"
-        js_file.write_text('''
+        js_file.write_text(
+            """
 class UserService {
     constructor(db) {
         this.db = db;
@@ -62,7 +65,8 @@ function processData(data) {
 }
 
 const arrowFunc = (a, b) => a + b;
-''')
+"""
+        )
 
         result = parser.parse_file(js_file)
 
@@ -74,7 +78,8 @@ const arrowFunc = (a, b) => a + b;
     def test_parse_typescript_file(self, parser: ASTParser, tmp_path: Path) -> None:
         """Test parsing a TypeScript file."""
         ts_file = tmp_path / "test.ts"
-        ts_file.write_text('''
+        ts_file.write_text(
+            """
 interface User {
     id: number;
     name: string;
@@ -95,7 +100,8 @@ class UserRepository {
 function createUser(name: string): User {
     return { id: Date.now(), name };
 }
-''')
+"""
+        )
 
         result = parser.parse_file(ts_file)
 
@@ -109,21 +115,25 @@ function createUser(name: string): User {
         """Test parsing a directory with multiple files."""
         # Create Python file
         py_file = tmp_path / "module.py"
-        py_file.write_text('''
+        py_file.write_text(
+            """
 class Service:
     pass
 
 def helper():
     pass
-''')
+"""
+        )
 
         # Create JavaScript file
         js_file = tmp_path / "script.js"
-        js_file.write_text('''
+        js_file.write_text(
+            """
 function main() {
     console.log("Hello");
 }
-''')
+"""
+        )
 
         result = parser.parse_directory(tmp_path)
 
@@ -159,7 +169,9 @@ function main() {
         # Should only include main.py
         assert result.module_count == 1
 
-    def test_unsupported_file_extension(self, parser: ASTParser, tmp_path: Path) -> None:
+    def test_unsupported_file_extension(
+        self, parser: ASTParser, tmp_path: Path
+    ) -> None:
         """Test that unsupported extensions return error result."""
         txt_file = tmp_path / "readme.txt"
         txt_file.write_text("This is not code")
@@ -174,12 +186,14 @@ function main() {
     def test_to_dict(self, parser: ASTParser, tmp_path: Path) -> None:
         """Test converting AST to dictionary."""
         py_file = tmp_path / "test.py"
-        py_file.write_text('''
+        py_file.write_text(
+            """
 class TestClass:
     def method(self): pass
 
 def function(): pass
-''')
+"""
+        )
 
         result = parser.parse_directory(tmp_path)
         data = result.to_dict()
@@ -193,10 +207,13 @@ def function(): pass
     # Docstring Extraction Tests (T076c-T076f)
     # =========================================================================
 
-    def test_python_docstring_extraction(self, parser: ASTParser, tmp_path: Path) -> None:
+    def test_python_docstring_extraction(
+        self, parser: ASTParser, tmp_path: Path
+    ) -> None:
         """Test extracting Python docstrings from functions and classes (T076c)."""
         py_file = tmp_path / "documented.py"
-        py_file.write_text('''
+        py_file.write_text(
+            '''
 class DocumentedClass:
     """This is a class docstring.
 
@@ -220,7 +237,8 @@ def documented_function(x: int, y: str) -> bool:
 
 def no_docstring_function():
     return 42
-''')
+'''
+        )
 
         result = parser.parse_file(py_file)
 
@@ -245,16 +263,20 @@ def no_docstring_function():
         assert undoc_func is not None
         assert undoc_func.docstring is None
 
-    def test_python_return_type_extraction(self, parser: ASTParser, tmp_path: Path) -> None:
+    def test_python_return_type_extraction(
+        self, parser: ASTParser, tmp_path: Path
+    ) -> None:
         """Test extracting Python return type annotations (T076c)."""
         py_file = tmp_path / "typed.py"
-        py_file.write_text('''
+        py_file.write_text(
+            """
 def typed_function(x: int) -> str:
     return str(x)
 
 def untyped_function(x):
     return x
-''')
+"""
+        )
 
         result = parser.parse_file(py_file)
 
@@ -271,10 +293,13 @@ def untyped_function(x):
         assert untyped_func is not None
         assert untyped_func.return_type is None
 
-    def test_javascript_jsdoc_extraction(self, parser: ASTParser, tmp_path: Path) -> None:
+    def test_javascript_jsdoc_extraction(
+        self, parser: ASTParser, tmp_path: Path
+    ) -> None:
         """Test extracting JSDoc comments from JavaScript functions (T076d)."""
         js_file = tmp_path / "documented.js"
-        js_file.write_text('''
+        js_file.write_text(
+            """
 /**
  * Process user data and return result.
  * @param {string} name - The user name.
@@ -295,7 +320,8 @@ function undocumentedFunction() {
 class UserManager {
     constructor() {}
 }
-''')
+"""
+        )
 
         result = parser.parse_file(js_file)
 
@@ -325,7 +351,8 @@ class UserManager {
     def test_go_doc_comment_extraction(self, parser: ASTParser, tmp_path: Path) -> None:
         """Test extracting Go doc comments from functions (T076e)."""
         go_file = tmp_path / "main.go"
-        go_file.write_text('''package main
+        go_file.write_text(
+            """package main
 
 // ProcessData takes input data and transforms it.
 // It returns the processed result or an error.
@@ -341,7 +368,8 @@ type User struct {
     ID   int
     Name string
 }
-''')
+"""
+        )
 
         result = parser.parse_file(go_file)
 
@@ -353,7 +381,10 @@ type User struct {
         )
         assert documented_func is not None
         assert documented_func.docstring is not None
-        assert "ProcessData" in documented_func.docstring or "input data" in documented_func.docstring
+        assert (
+            "ProcessData" in documented_func.docstring
+            or "input data" in documented_func.docstring
+        )
 
         # Find undocumented function
         undoc_func = next(
@@ -363,9 +394,7 @@ type User struct {
         assert undoc_func.docstring is None
 
         # Check struct docstring
-        user_struct = next(
-            (c for c in result.classes if c.name == "User"), None
-        )
+        user_struct = next((c for c in result.classes if c.name == "User"), None)
         assert user_struct is not None
         assert user_struct.docstring is not None
         assert "user in the system" in user_struct.docstring
@@ -373,7 +402,8 @@ type User struct {
     def test_source_snippet_extraction(self, parser: ASTParser, tmp_path: Path) -> None:
         """Test extracting source snippets (first 5 lines of body) (T076f)."""
         py_file = tmp_path / "snippet.py"
-        py_file.write_text('''
+        py_file.write_text(
+            '''
 def long_function(x, y, z):
     """A function with many lines."""
     result = x + y
@@ -383,7 +413,8 @@ def long_function(x, y, z):
     result = result - 5
     result = result ** 2
     return result
-''')
+'''
+        )
 
         result = parser.parse_file(py_file)
 

@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from orisha.analyzers.config_context import collect_config_context
+from chronicle.analyzers.config_context import collect_config_context
 
 
 class TestConfigContextCollector:
@@ -27,8 +27,7 @@ class TestConfigContextCollector:
         # Create a pyproject.toml
         pyproject = tmp_path / "pyproject.toml"
         pyproject.write_text(
-            '[project]\nname = "test-project"\n'
-            'dependencies = ["requests", "boto3"]'
+            '[project]\nname = "test-project"\n' 'dependencies = ["requests", "boto3"]'
         )
 
         context = collect_config_context(tmp_path)
@@ -37,12 +36,12 @@ class TestConfigContextCollector:
         assert "test-project" in context
         assert "requests" in context
 
-    def test_collect_from_repo_with_orisha_config(self, tmp_path: Path) -> None:
-        """Test collecting context from a repo with .orisha/config.yaml."""
-        # Create .orisha/config.yaml
-        orisha_dir = tmp_path / ".orisha"
-        orisha_dir.mkdir()
-        config = orisha_dir / "config.yaml"
+    def test_collect_from_repo_with_chronicle_config(self, tmp_path: Path) -> None:
+        """Test collecting context from a repo with .chronicle/config.yaml."""
+        # Create .chronicle/config.yaml
+        chronicle_dir = tmp_path / ".chronicle"
+        chronicle_dir.mkdir()
+        config = chronicle_dir / "config.yaml"
         config.write_text(
             'llm:\n  provider: "bedrock"\n'
             '  model: "anthropic.claude-3-sonnet-20240229-v1:0"'
@@ -50,7 +49,7 @@ class TestConfigContextCollector:
 
         context = collect_config_context(tmp_path)
 
-        assert ".orisha/config.yaml" in context
+        assert ".chronicle/config.yaml" in context
         assert "bedrock" in context
         assert "anthropic" in context
 
@@ -97,7 +96,7 @@ class TestConfigContextCollector:
         """Test collecting docker-compose.yml."""
         docker = tmp_path / "docker-compose.yml"
         docker.write_text(
-            'services:\n  db:\n    image: postgres:15\n  redis:\n    image: redis:7'
+            "services:\n  db:\n    image: postgres:15\n  redis:\n    image: redis:7"
         )
 
         context = collect_config_context(tmp_path)

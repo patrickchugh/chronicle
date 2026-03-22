@@ -4,9 +4,9 @@ from pathlib import Path
 
 import pytest
 
-from orisha.models import Repository
-from orisha.models.analysis import AnalysisStatus
-from orisha.pipeline import AnalysisPipeline, PipelineOptions
+from chronicle.models import Repository
+from chronicle.models.analysis import AnalysisStatus
+from chronicle.pipeline import AnalysisPipeline, PipelineOptions
 
 
 class TestPipelineOptions:
@@ -52,7 +52,8 @@ class TestAnalysisPipeline:
         git_dir.mkdir()
 
         # Create some source files
-        (tmp_path / "main.py").write_text('''
+        (tmp_path / "main.py").write_text(
+            '''
 """Main module."""
 
 class App:
@@ -67,22 +68,27 @@ def main():
 
 if __name__ == "__main__":
     main()
-''')
+'''
+        )
 
         # Create package.json
-        (tmp_path / "package.json").write_text('''{
+        (tmp_path / "package.json").write_text(
+            """{
     "name": "test-project",
     "version": "1.0.0",
     "dependencies": {
         "express": "^4.18.0"
     }
-}''')
+}"""
+        )
 
         # Create requirements.txt
-        (tmp_path / "requirements.txt").write_text('''
+        (tmp_path / "requirements.txt").write_text(
+            """
 flask==2.3.0
 requests>=2.28.0
-''')
+"""
+        )
 
         return Repository.from_path(tmp_path)
 

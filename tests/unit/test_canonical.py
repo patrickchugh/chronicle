@@ -2,7 +2,7 @@
 
 from datetime import UTC, datetime
 
-from orisha.models.canonical import (
+from chronicle.models.canonical import (
     CanonicalArchitecture,
     CanonicalAST,
     CanonicalClass,
@@ -31,22 +31,26 @@ class TestCanonicalSBOM:
         """Test adding packages to SBOM."""
         sbom = CanonicalSBOM()
 
-        sbom.add_package(CanonicalPackage(
-            name="express",
-            ecosystem="npm",
-            version="4.18.0",
-        ))
+        sbom.add_package(
+            CanonicalPackage(
+                name="express",
+                ecosystem="npm",
+                version="4.18.0",
+            )
+        )
 
         assert sbom.package_count == 1
         assert sbom.get_unique_ecosystems() == ["npm"]
 
     def test_get_packages_by_ecosystem(self) -> None:
         """Test filtering packages by ecosystem."""
-        sbom = CanonicalSBOM(packages=[
-            CanonicalPackage(name="express", ecosystem="npm"),
-            CanonicalPackage(name="lodash", ecosystem="npm"),
-            CanonicalPackage(name="flask", ecosystem="pypi"),
-        ])
+        sbom = CanonicalSBOM(
+            packages=[
+                CanonicalPackage(name="express", ecosystem="npm"),
+                CanonicalPackage(name="lodash", ecosystem="npm"),
+                CanonicalPackage(name="flask", ecosystem="pypi"),
+            ]
+        )
 
         npm_packages = sbom.get_packages_by_ecosystem("npm")
 
@@ -80,12 +84,16 @@ class TestCanonicalSBOM:
 
     def test_get_direct_packages(self) -> None:
         """Test filtering direct dependencies (T064k)."""
-        sbom = CanonicalSBOM(packages=[
-            CanonicalPackage(name="express", ecosystem="npm", is_direct=True),
-            CanonicalPackage(name="lodash", ecosystem="npm", is_direct=True),
-            CanonicalPackage(name="accepts", ecosystem="npm", is_direct=False),
-            CanonicalPackage(name="array-flatten", ecosystem="npm", is_direct=False),
-        ])
+        sbom = CanonicalSBOM(
+            packages=[
+                CanonicalPackage(name="express", ecosystem="npm", is_direct=True),
+                CanonicalPackage(name="lodash", ecosystem="npm", is_direct=True),
+                CanonicalPackage(name="accepts", ecosystem="npm", is_direct=False),
+                CanonicalPackage(
+                    name="array-flatten", ecosystem="npm", is_direct=False
+                ),
+            ]
+        )
 
         direct = sbom.get_direct_packages()
 
@@ -95,12 +103,16 @@ class TestCanonicalSBOM:
 
     def test_get_transitive_packages(self) -> None:
         """Test filtering transitive dependencies (T064k)."""
-        sbom = CanonicalSBOM(packages=[
-            CanonicalPackage(name="express", ecosystem="npm", is_direct=True),
-            CanonicalPackage(name="lodash", ecosystem="npm", is_direct=True),
-            CanonicalPackage(name="accepts", ecosystem="npm", is_direct=False),
-            CanonicalPackage(name="array-flatten", ecosystem="npm", is_direct=False),
-        ])
+        sbom = CanonicalSBOM(
+            packages=[
+                CanonicalPackage(name="express", ecosystem="npm", is_direct=True),
+                CanonicalPackage(name="lodash", ecosystem="npm", is_direct=True),
+                CanonicalPackage(name="accepts", ecosystem="npm", is_direct=False),
+                CanonicalPackage(
+                    name="array-flatten", ecosystem="npm", is_direct=False
+                ),
+            ]
+        )
 
         transitive = sbom.get_transitive_packages()
 
@@ -110,23 +122,29 @@ class TestCanonicalSBOM:
 
     def test_direct_package_count(self) -> None:
         """Test direct_package_count property (T064k)."""
-        sbom = CanonicalSBOM(packages=[
-            CanonicalPackage(name="express", ecosystem="npm", is_direct=True),
-            CanonicalPackage(name="lodash", ecosystem="npm", is_direct=True),
-            CanonicalPackage(name="accepts", ecosystem="npm", is_direct=False),
-            CanonicalPackage(name="array-flatten", ecosystem="npm", is_direct=False),
-            CanonicalPackage(name="body-parser", ecosystem="npm", is_direct=False),
-        ])
+        sbom = CanonicalSBOM(
+            packages=[
+                CanonicalPackage(name="express", ecosystem="npm", is_direct=True),
+                CanonicalPackage(name="lodash", ecosystem="npm", is_direct=True),
+                CanonicalPackage(name="accepts", ecosystem="npm", is_direct=False),
+                CanonicalPackage(
+                    name="array-flatten", ecosystem="npm", is_direct=False
+                ),
+                CanonicalPackage(name="body-parser", ecosystem="npm", is_direct=False),
+            ]
+        )
 
         assert sbom.package_count == 5
         assert sbom.direct_package_count == 2
 
     def test_to_dict_includes_direct_package_count(self) -> None:
         """Test that to_dict includes direct_package_count (T064k)."""
-        sbom = CanonicalSBOM(packages=[
-            CanonicalPackage(name="express", ecosystem="npm", is_direct=True),
-            CanonicalPackage(name="accepts", ecosystem="npm", is_direct=False),
-        ])
+        sbom = CanonicalSBOM(
+            packages=[
+                CanonicalPackage(name="express", ecosystem="npm", is_direct=True),
+                CanonicalPackage(name="accepts", ecosystem="npm", is_direct=False),
+            ]
+        )
 
         data = sbom.to_dict()
 
@@ -267,28 +285,34 @@ class TestCanonicalAST:
         """Test adding AST elements."""
         ast = CanonicalAST()
 
-        ast.add_module(CanonicalModule(
-            name="user_service",
-            path="src/services/user.py",
-            language="python",
-            imports=["typing", "dataclasses"],
-        ))
+        ast.add_module(
+            CanonicalModule(
+                name="user_service",
+                path="src/services/user.py",
+                language="python",
+                imports=["typing", "dataclasses"],
+            )
+        )
 
-        ast.add_class(CanonicalClass(
-            name="UserService",
-            file="src/services/user.py",
-            line=10,
-            methods=["create", "get", "delete"],
-            bases=["BaseService"],
-        ))
+        ast.add_class(
+            CanonicalClass(
+                name="UserService",
+                file="src/services/user.py",
+                line=10,
+                methods=["create", "get", "delete"],
+                bases=["BaseService"],
+            )
+        )
 
-        ast.add_function(CanonicalFunction(
-            name="main",
-            file="src/main.py",
-            line=1,
-            parameters=[],
-            is_async=False,
-        ))
+        ast.add_function(
+            CanonicalFunction(
+                name="main",
+                file="src/main.py",
+                line=1,
+                parameters=[],
+                is_async=False,
+            )
+        )
 
         assert ast.module_count == 1
         assert ast.class_count == 1
@@ -299,15 +323,9 @@ class TestCanonicalAST:
         """Test getting elements by file path."""
         ast = CanonicalAST()
 
-        ast.add_class(CanonicalClass(
-            name="A", file="file1.py", line=1
-        ))
-        ast.add_class(CanonicalClass(
-            name="B", file="file1.py", line=10
-        ))
-        ast.add_class(CanonicalClass(
-            name="C", file="file2.py", line=1
-        ))
+        ast.add_class(CanonicalClass(name="A", file="file1.py", line=1))
+        ast.add_class(CanonicalClass(name="B", file="file1.py", line=10))
+        ast.add_class(CanonicalClass(name="C", file="file2.py", line=1))
 
         classes_in_file1 = ast.get_classes_in_file("file1.py")
 
@@ -317,11 +335,13 @@ class TestCanonicalAST:
     def test_to_dict(self) -> None:
         """Test converting AST to dictionary."""
         ast = CanonicalAST()
-        ast.add_module(CanonicalModule(
-            name="test",
-            path="test.py",
-            language="python",
-        ))
+        ast.add_module(
+            CanonicalModule(
+                name="test",
+                path="test.py",
+                language="python",
+            )
+        )
 
         data = ast.to_dict()
 
@@ -395,9 +415,14 @@ return result"""
             description="Transforms raw data into the expected output format.",
         )
 
-        assert func.description == "Transforms raw data into the expected output format."
+        assert (
+            func.description == "Transforms raw data into the expected output format."
+        )
         data = func.to_dict()
-        assert data["description"] == "Transforms raw data into the expected output format."
+        assert (
+            data["description"]
+            == "Transforms raw data into the expected output format."
+        )
 
     def test_function_with_all_new_fields(self) -> None:
         """Test CanonicalFunction with all new fields set."""
@@ -416,10 +441,16 @@ return result"""
         assert func.docstring == "A fully documented function."
         assert func.return_type == "dict[str, int]"
         assert func.source_snippet == "return {'sum': a + b + c}"
-        assert func.description == "Calculates the sum of three numbers and returns it in a dict."
+        assert (
+            func.description
+            == "Calculates the sum of three numbers and returns it in a dict."
+        )
 
         data = func.to_dict()
-        assert all(key in data for key in ["docstring", "return_type", "source_snippet", "description"])
+        assert all(
+            key in data
+            for key in ["docstring", "return_type", "source_snippet", "description"]
+        )
 
     def test_function_optional_fields_are_none_by_default(self) -> None:
         """Test that new fields are None by default."""
@@ -466,7 +497,10 @@ class TestCanonicalClassNewFields:
 
         assert cls.description == "Handles data transformation and validation pipeline."
         data = cls.to_dict()
-        assert data["description"] == "Handles data transformation and validation pipeline."
+        assert (
+            data["description"]
+            == "Handles data transformation and validation pipeline."
+        )
 
     def test_class_with_both_docstring_and_description(self) -> None:
         """Test CanonicalClass with both docstring and description."""

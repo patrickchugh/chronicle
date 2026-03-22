@@ -1,13 +1,13 @@
-# Implementation Plan: Orisha - Automated System Documentation Generator
+# Implementation Plan: chronicle - Automated System Documentation Generator
 
 **Branch**: `001-system-doc-generator` | **Date**: 2026-01-31 | **Spec**: [spec.md](spec.md)
-**Input**: Feature specification from `/specs/001-orisha-system-doc-generator/spec.md`
+**Input**: Feature specification from `/specs/001-chronicle-system-doc-generator/spec.md`
 
 **Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
 
 ## Summary
 
-Orisha is an automated system documentation generator for enterprise IT audit, architecture, security, and business stakeholders. It runs in CI/CD pipelines, performing deterministic analysis first (AST parsing, Syft SBOM, Terravision diagrams), then using LLM to fill gaps and summarize sections into a Jinja2 template. Output must be reproducible across runs.
+chronicle is an automated system documentation generator for enterprise IT audit, architecture, security, and business stakeholders. It runs in CI/CD pipelines, performing deterministic analysis first (AST parsing, Syft SBOM, Terravision diagrams), then using LLM to fill gaps and summarize sections into a Jinja2 template. Output must be reproducible across runs.
 
 ## Technical Context
 
@@ -37,14 +37,14 @@ Orisha is an automated system documentation generator for enterprise IT audit, a
 |-----------|--------|-------|
 | I. Deterministic-First | ✅ | Analyzers module runs before LLM module; LLM is supplementary |
 | II. Reproducibility | ✅ | LLM config enforces temperature=0; VersionEntry tracks all changes |
-| III. Preflight Validation | ✅ | `utils/preflight.py` validates tools before `orisha write` proceeds |
+| III. Preflight Validation | ✅ | `utils/preflight.py` validates tools before `chronicle write` proceeds |
 | IV. CI/CD Compatibility | ✅ | No interactive prompts; exit codes 0/1/2; JSON output mode; env var support |
 | V. Tool Agnosticism | ✅ | Adapters output canonical formats (`models/canonical/`); tools swappable via config |
-| VI. Human Annotation Persistence | ✅ | `.orisha/sections/` stores human markdown files; merge on regeneration |
+| VI. Human Annotation Persistence | ✅ | `.chronicle/sections/` stores human markdown files; merge on regeneration |
 
 **Quality Gates Alignment:**
 - Deterministic Analysis: Unit tests with fixture comparison planned in `tests/unit/test_analyzers.py`
-- Preflight Check: `orisha check` command validates all external tools
+- Preflight Check: `chronicle check` command validates all external tools
 - Exit Codes: CLI contract defines 0=success, 1=error, 2=warning
 - Reproducibility: Integration test for consecutive run comparison in `tests/integration/test_full_pipeline.py`
 - Canonical Format Compliance: All adapters must output validated canonical types; unit tests verify schema conformance
@@ -68,9 +68,9 @@ specs/[###-feature]/
 ### Source Code (repository root)
 
 ```text
-src/orisha/
+src/chronicle/
 ├── __init__.py
-├── __main__.py          # Entry point for python -m orisha
+├── __main__.py          # Entry point for python -m chronicle
 ├── cli.py               # CLI interface (Typer)
 ├── config.py            # Configuration loading and validation
 ├── models/
@@ -112,7 +112,7 @@ src/orisha/
     ├── preflight.py     # External tool availability checks
     └── version.py       # Version history tracking
 
-.orisha/                 # User configuration directory
+.chronicle/                 # User configuration directory
 ├── config.yaml          # All configuration (tools, LLM, sections)
 └── sections/            # Human-authored content (Principle VI)
     ├── overview.md      # Merged with generated overview
@@ -133,7 +133,7 @@ tests/
     └── sections/            # Sample human section files
 ```
 
-**Structure Decision**: Single CLI application structure. The `src/orisha/` package contains all application code with clear separation between analyzers (deterministic), LLM integration, and renderers. Tests mirror the source structure with fixtures for mock repositories.
+**Structure Decision**: Single CLI application structure. The `src/chronicle/` package contains all application code with clear separation between analyzers (deterministic), LLM integration, and renderers. Tests mirror the source structure with fixtures for mock repositories.
 
 ## Complexity Tracking
 

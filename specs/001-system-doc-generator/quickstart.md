@@ -1,4 +1,4 @@
-# Quickstart: Orisha
+# Quickstart: chronicle
 
 **Date**: 2026-01-31
 **Branch**: `001-system-doc-generator`
@@ -28,11 +28,11 @@
 
 ```bash
 # Install from PyPI (when published)
-pip install orisha
+pip install chronicle
 
 # Or install from source
-git clone https://github.com/your-org/orisha.git
-cd orisha
+git clone https://github.com/your-org/chronicle.git
+cd chronicle
 pip install -e .
 ```
 
@@ -44,15 +44,15 @@ pip install -e .
 
 ```bash
 cd /path/to/your/repo
-orisha init
+chronicle init
 ```
 
-This creates `.orisha/config.yaml` with default settings.
+This creates `.chronicle/config.yaml` with default settings.
 
 ### 2. Write documentation
 
 ```bash
-orisha write
+chronicle write
 ```
 
 Output: `./docs/system.md` (or as configured in YAML)
@@ -60,17 +60,17 @@ Output: `./docs/system.md` (or as configured in YAML)
 ### 3. Write in CI/CD
 
 ```bash
-orisha write --ci
+chronicle write --ci
 ```
 
-All settings (LLM, tools, output path) come from `.orisha/config.yaml`.
+All settings (LLM, tools, output path) come from `.chronicle/config.yaml`.
 
 ---
 
 ## Verify Tool Availability
 
 ```bash
-orisha check
+chronicle check
 ```
 
 Example output:
@@ -87,15 +87,15 @@ All tools available. Ready to generate documentation.
 
 ## Configuration
 
-All settings are managed in `.orisha/config.yaml`. CLI flags are minimal and only for per-run overrides.
+All settings are managed in `.chronicle/config.yaml`. CLI flags are minimal and only for per-run overrides.
 
 ### Initialize configuration file
 
 ```bash
-orisha init
+chronicle init
 ```
 
-Creates `.orisha/config.yaml` with default settings.
+Creates `.chronicle/config.yaml` with default settings.
 
 ### Example configuration
 
@@ -114,10 +114,10 @@ tools:
 # Add your own content to merge with generated docs
 sections:
   overview:
-    file: ".orisha/sections/overview.md"
+    file: ".chronicle/sections/overview.md"
     strategy: "prepend"     # prepend | append | replace
   security:
-    file: ".orisha/sections/security.md"
+    file: ".chronicle/sections/security.md"
     strategy: "append"
 
 # LLM settings (optional - works without LLM)
@@ -134,14 +134,14 @@ llm:
 
 ### Use a custom Jinja2 template
 
-Add to `.orisha/config.yaml`:
+Add to `.chronicle/config.yaml`:
 
 ```yaml
 template:
   path: "./my-template.md.j2"
 ```
 
-Then run `orisha write` as usual.
+Then run `chronicle write` as usual.
 
 ### Available template variables
 
@@ -164,7 +164,7 @@ See the [Template Contract](contracts/template.md) for full variable documentati
 
 ## CI/CD Integration
 
-Configuration is committed to the repo in `.orisha/config.yaml`. CI just runs `orisha write --ci`.
+Configuration is committed to the repo in `.chronicle/config.yaml`. CI just runs `chronicle write --ci`.
 
 ### GitHub Actions
 
@@ -180,15 +180,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Orisha
-        run: pip install orisha
+      - name: Install chronicle
+        run: pip install chronicle
 
       - name: Install Syft
         run: |
           curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
 
       - name: Write documentation
-        run: orisha write --ci
+        run: chronicle write --ci
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
@@ -207,8 +207,8 @@ jobs:
 write-docs:
   image: python:3.11
   script:
-    - pip install orisha
-    - orisha write --ci
+    - pip install chronicle
+    - chronicle write --ci
   artifacts:
     paths:
       - docs/
@@ -222,27 +222,27 @@ write-docs:
 
 ### "Syft not found" warning
 
-Orisha continues without SBOM. Install Syft for dependency scanning:
+chronicle continues without SBOM. Install Syft for dependency scanning:
 ```bash
 curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
 ```
 
 ### "Terravision not found" warning
 
-Orisha continues without architecture diagrams. Install Terravision if you have Terraform files:
+chronicle continues without architecture diagrams. Install Terravision if you have Terraform files:
 ```bash
 pip install terravision
 ```
 
 ### "LLM request failed"
 
-Documentation is written with placeholder text for LLM sections. Check your API key and network connectivity. Orisha works without LLM—you'll just get deterministic analysis only.
+Documentation is written with placeholder text for LLM sections. Check your API key and network connectivity. chronicle works without LLM—you'll just get deterministic analysis only.
 
 ### Large repository performance
 
 For repositories over 100k lines, use verbose mode to monitor progress:
 ```bash
-orisha write --verbose
+chronicle write --verbose
 ```
 
 ---

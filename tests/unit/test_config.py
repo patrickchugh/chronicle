@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from orisha.config import (
+from chronicle.config import (
     LLMConfig,
     SectionConfig,
     find_config_file,
@@ -67,9 +67,9 @@ class TestSubstituteEnvVars:
 class TestFindConfigFile:
     """Tests for config file discovery."""
 
-    def test_find_orisha_config(self, tmp_path: Path) -> None:
-        """Test finding .orisha/config.yaml."""
-        config_dir = tmp_path / ".orisha"
+    def test_find_chronicle_config(self, tmp_path: Path) -> None:
+        """Test finding .chronicle/config.yaml."""
+        config_dir = tmp_path / ".chronicle"
         config_dir.mkdir()
         config_file = config_dir / "config.yaml"
         config_file.write_text("output:\n  path: test.md")
@@ -79,28 +79,28 @@ class TestFindConfigFile:
         assert result == config_file
 
     def test_find_root_config(self, tmp_path: Path) -> None:
-        """Test finding orisha.yaml at root."""
-        config_file = tmp_path / "orisha.yaml"
+        """Test finding chronicle.yaml at root."""
+        config_file = tmp_path / "chronicle.yaml"
         config_file.write_text("output:\n  path: test.md")
 
         result = find_config_file(tmp_path)
 
         assert result == config_file
 
-    def test_prefer_orisha_dir_over_root(self, tmp_path: Path) -> None:
-        """Test .orisha/config.yaml is preferred over orisha.yaml."""
+    def test_prefer_chronicle_dir_over_root(self, tmp_path: Path) -> None:
+        """Test .chronicle/config.yaml is preferred over chronicle.yaml."""
         # Create both
-        config_dir = tmp_path / ".orisha"
+        config_dir = tmp_path / ".chronicle"
         config_dir.mkdir()
-        orisha_config = config_dir / "config.yaml"
-        orisha_config.write_text("# preferred")
+        chronicle_config = config_dir / "config.yaml"
+        chronicle_config.write_text("# preferred")
 
-        root_config = tmp_path / "orisha.yaml"
+        root_config = tmp_path / "chronicle.yaml"
         root_config.write_text("# fallback")
 
         result = find_config_file(tmp_path)
 
-        assert result == orisha_config
+        assert result == chronicle_config
 
     def test_no_config_returns_none(self, tmp_path: Path) -> None:
         """Test returns None when no config found."""
@@ -128,26 +128,30 @@ class TestLoadConfigFromDict:
 
     def test_custom_output(self) -> None:
         """Test custom output configuration."""
-        config = load_config_from_dict({
-            "output": {
-                "path": "custom/path.md",
-                "format": "html",
+        config = load_config_from_dict(
+            {
+                "output": {
+                    "path": "custom/path.md",
+                    "format": "html",
+                }
             }
-        })
+        )
 
         assert config.output.path == "custom/path.md"
         assert config.output.format == "html"
 
     def test_llm_config(self) -> None:
         """Test LLM configuration."""
-        config = load_config_from_dict({
-            "llm": {
-                "provider": "ollama",
-                "model": "llama2",
-                "temperature": 0,
-                "enabled": True,
+        config = load_config_from_dict(
+            {
+                "llm": {
+                    "provider": "ollama",
+                    "model": "llama2",
+                    "temperature": 0,
+                    "enabled": True,
+                }
             }
-        })
+        )
 
         assert config.llm is not None
         assert config.llm.provider == "ollama"
@@ -157,21 +161,23 @@ class TestLoadConfigFromDict:
 
     def test_sections_config(self) -> None:
         """Test sections configuration."""
-        config = load_config_from_dict({
-            "sections": {
-                "overview": {
-                    "file": ".orisha/sections/overview.md",
-                    "strategy": "prepend",
-                },
-                "security": {
-                    "file": ".orisha/sections/security.md",
-                    "strategy": "append",
-                },
+        config = load_config_from_dict(
+            {
+                "sections": {
+                    "overview": {
+                        "file": ".chronicle/sections/overview.md",
+                        "strategy": "prepend",
+                    },
+                    "security": {
+                        "file": ".chronicle/sections/security.md",
+                        "strategy": "append",
+                    },
+                }
             }
-        })
+        )
 
         assert "overview" in config.sections
-        assert config.sections["overview"].file == ".orisha/sections/overview.md"
+        assert config.sections["overview"].file == ".chronicle/sections/overview.md"
         assert config.sections["overview"].strategy == "prepend"
 
 

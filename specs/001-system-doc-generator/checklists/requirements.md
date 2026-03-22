@@ -1,4 +1,4 @@
-# Specification Quality Checklist: Orisha - Automated System Documentation Generator
+# Specification Quality Checklist: chronicle - Automated System Documentation Generator
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2026-01-31

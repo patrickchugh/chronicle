@@ -2,7 +2,7 @@
 
 import pytest
 
-from orisha.models.llm_config import VALID_PROVIDERS, LLMConfig
+from chronicle.models.llm_config import VALID_PROVIDERS, LLMConfig
 
 
 class TestLLMConfig:

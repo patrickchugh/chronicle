@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pytest
 
-from orisha.models import AnalysisError, Repository, VersionEntry
-from orisha.models.analysis import AuthorType
+from chronicle.models import AnalysisError, Repository, VersionEntry
+from chronicle.models.analysis import AuthorType
 
 
 class TestRepository:
@@ -122,7 +122,7 @@ class TestVersionEntry:
         )
 
         assert entry.version == "1.0.0"
-        assert entry.author == "Orisha"
+        assert entry.author == "chronicle"
         assert entry.author_type == AuthorType.AUTOMATED
         assert entry.changes == "Initial documentation"
         assert entry.git_ref == "abc123"
@@ -138,7 +138,7 @@ class TestVersionEntry:
         data = entry.to_dict()
 
         assert data["version"] == "1.0.0"
-        assert data["author"] == "Orisha"
+        assert data["author"] == "chronicle"
         assert data["author_type"] == "automated"
         assert "timestamp" in data
 

@@ -1,0 +1,26 @@
+# chronicle Configuration
+# Documentation: https://github.com/chronicle/chronicle
+
+# Output settings
+output:
+  path: "docs/SYSTEM.md"
+  format: "markdown"  # markdown, html, confluence
+
+# Tool selection (Principle V: Tool Agnosticism)
+tools:
+  sbom: "syft"           # SBOM tool: syft, trivy
+  diagrams: "terravision"  # Diagram tool: terravision
+
+# LLM settings (REQUIRED for generating documentation summaries)
+llm:
+  provider: "bedrock"
+  model: "anthropic.claude-3-sonnet-20240229-v1:0"
+  # AWS credentials loaded from environment or ~/.aws/credentials
+  temperature: 0  # MUST be 0 for reproducibility (Principle II)
+  max_tokens: 4096
+
+# CI/CD settings
+ci:
+  fail_on_warning: false
+  json_output: false
+  timeout: 300

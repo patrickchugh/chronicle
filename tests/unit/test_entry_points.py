@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from orisha.analyzers.entry_points import EntryPointDetector, detect_entry_points
+from chronicle.analyzers.entry_points import EntryPointDetector, detect_entry_points
 
 
 class TestEntryPointDetector:
@@ -18,7 +18,8 @@ class TestEntryPointDetector:
     def test_detect_typer_commands(self, tmp_path: Path) -> None:
         """Test detecting Typer CLI commands."""
         cli_file = tmp_path / "cli.py"
-        cli_file.write_text('''
+        cli_file.write_text(
+            '''
 import typer
 
 app = typer.Typer()
@@ -32,7 +33,8 @@ def hello(name: str):
 def say_goodbye():
     """Say goodbye."""
     print("Goodbye")
-''')
+'''
+        )
 
         detector = EntryPointDetector(tmp_path)
         entry_points = detector.detect_entry_points()
@@ -44,7 +46,8 @@ def say_goodbye():
     def test_detect_click_commands(self, tmp_path: Path) -> None:
         """Test detecting Click CLI commands."""
         cli_file = tmp_path / "commands.py"
-        cli_file.write_text('''
+        cli_file.write_text(
+            '''
 import click
 
 @click.command()
@@ -56,7 +59,8 @@ def main():
 def process_data():
     """Process some data."""
     pass
-''')
+'''
+        )
 
         detector = EntryPointDetector(tmp_path)
         entry_points = detector.detect_entry_points()
@@ -67,7 +71,8 @@ def process_data():
     def test_detect_fastapi_endpoints(self, tmp_path: Path) -> None:
         """Test detecting FastAPI endpoints."""
         api_file = tmp_path / "api.py"
-        api_file.write_text('''
+        api_file.write_text(
+            '''
 from fastapi import FastAPI
 
 app = FastAPI()
@@ -85,7 +90,8 @@ def create_user(user: dict):
 @router.get("/items/{item_id}")
 def get_item(item_id: int):
     return {"id": item_id}
-''')
+'''
+        )
 
         detector = EntryPointDetector(tmp_path)
         entry_points = detector.detect_entry_points()
@@ -100,7 +106,8 @@ def get_item(item_id: int):
     def test_detect_flask_routes(self, tmp_path: Path) -> None:
         """Test detecting Flask routes."""
         app_file = tmp_path / "app.py"
-        app_file.write_text('''
+        app_file.write_text(
+            """
 from flask import Flask
 
 app = Flask(__name__)
@@ -116,7 +123,8 @@ def data():
 @bp.route("/blueprint/route")
 def blueprint_route():
     pass
-''')
+"""
+        )
 
         detector = EntryPointDetector(tmp_path)
         entry_points = detector.detect_entry_points()
@@ -127,13 +135,15 @@ def blueprint_route():
     def test_detect_main_block(self, tmp_path: Path) -> None:
         """Test detecting if __name__ == '__main__' blocks."""
         main_file = tmp_path / "main.py"
-        main_file.write_text('''
+        main_file.write_text(
+            """
 def main():
     print("Running main")
 
 if __name__ == "__main__":
     main()
-''')
+"""
+        )
 
         detector = EntryPointDetector(tmp_path)
         entry_points = detector.detect_entry_points()
@@ -145,7 +155,8 @@ if __name__ == "__main__":
     def test_detect_express_endpoints(self, tmp_path: Path) -> None:
         """Test detecting Express.js endpoints."""
         express_file = tmp_path / "server.js"
-        express_file.write_text('''
+        express_file.write_text(
+            """
 const express = require('express');
 const app = express();
 
@@ -158,7 +169,8 @@ app.post('/api/users', (req, res) => {
 });
 
 router.get('/items/:id', getItem);
-''')
+"""
+        )
 
         detector = EntryPointDetector(tmp_path)
         entry_points = detector.detect_entry_points()
@@ -169,14 +181,16 @@ router.get('/items/:id', getItem);
     def test_detect_lambda_handler(self, tmp_path: Path) -> None:
         """Test detecting Lambda/Cloud function handlers."""
         handler_file = tmp_path / "handler.js"
-        handler_file.write_text('''
+        handler_file.write_text(
+            """
 exports.handler = async (event, context) => {
     return {
         statusCode: 200,
         body: JSON.stringify({ message: "Hello" })
     };
 };
-''')
+"""
+        )
 
         detector = EntryPointDetector(tmp_path)
         entry_points = detector.detect_entry_points()
@@ -188,7 +202,8 @@ exports.handler = async (event, context) => {
     def test_detect_go_main(self, tmp_path: Path) -> None:
         """Test detecting Go main function."""
         go_file = tmp_path / "main.go"
-        go_file.write_text('''
+        go_file.write_text(
+            """
 package main
 
 import "fmt"
@@ -196,7 +211,8 @@ import "fmt"
 func main() {
     fmt.Println("Hello")
 }
-''')
+"""
+        )
 
         detector = EntryPointDetector(tmp_path)
         entry_points = detector.detect_entry_points()
@@ -207,7 +223,8 @@ func main() {
     def test_detect_go_http_handlers(self, tmp_path: Path) -> None:
         """Test detecting Go HTTP handlers."""
         go_file = tmp_path / "server.go"
-        go_file.write_text('''
+        go_file.write_text(
+            """
 package main
 
 import "net/http"
@@ -216,7 +233,8 @@ func main() {
     http.HandleFunc("/api/users", handleUsers)
     http.HandleFunc("/api/items", handleItems)
 }
-''')
+"""
+        )
 
         detector = EntryPointDetector(tmp_path)
         entry_points = detector.detect_entry_points()
@@ -227,7 +245,8 @@ func main() {
     def test_detect_spring_endpoints(self, tmp_path: Path) -> None:
         """Test detecting Spring Boot endpoints."""
         java_file = tmp_path / "UserController.java"
-        java_file.write_text('''
+        java_file.write_text(
+            """
 package com.example.controller;
 
 import org.springframework.web.bind.annotation.*;
@@ -251,7 +270,8 @@ public class UserController {
         userService.delete(id);
     }
 }
-''')
+"""
+        )
 
         detector = EntryPointDetector(tmp_path)
         entry_points = detector.detect_entry_points()
@@ -262,7 +282,8 @@ public class UserController {
     def test_detect_java_main(self, tmp_path: Path) -> None:
         """Test detecting Java main method."""
         java_file = tmp_path / "Application.java"
-        java_file.write_text('''
+        java_file.write_text(
+            """
 package com.example;
 
 public class Application {
@@ -270,7 +291,8 @@ public class Application {
         System.out.println("Hello");
     }
 }
-''')
+"""
+        )
 
         detector = EntryPointDetector(tmp_path)
         entry_points = detector.detect_entry_points()
@@ -281,19 +303,23 @@ public class Application {
     def test_deduplicate_entry_points(self, tmp_path: Path) -> None:
         """Test that duplicate entry points are removed."""
         cli_file = tmp_path / "cli.py"
-        cli_file.write_text('''
+        cli_file.write_text(
+            """
 @app.command()
 def mycommand():
     pass
-''')
+"""
+        )
 
         # Create duplicate in another file
         cli2_file = tmp_path / "cli2.py"
-        cli2_file.write_text('''
+        cli2_file.write_text(
+            """
 @app.command()
 def mycommand():
     pass
-''')
+"""
+        )
 
         detector = EntryPointDetector(tmp_path)
         entry_points = detector.detect_entry_points()
@@ -322,12 +348,14 @@ def mycommand():
     def test_extract_docstring_description(self, tmp_path: Path) -> None:
         """Test extracting docstring as description."""
         cli_file = tmp_path / "cli.py"
-        cli_file.write_text('''
+        cli_file.write_text(
+            '''
 @app.command()
 def documented_command():
     """This is a documented command that does something."""
     pass
-''')
+'''
+        )
 
         detector = EntryPointDetector(tmp_path)
         entry_points = detector.detect_entry_points()

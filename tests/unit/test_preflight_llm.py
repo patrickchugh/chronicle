@@ -2,7 +2,7 @@
 
 from unittest.mock import MagicMock, patch
 
-from orisha.utils.preflight import PreflightChecker, ToolCheck
+from chronicle.utils.preflight import PreflightChecker, ToolCheck
 
 
 class TestLiteLLMCheck:
@@ -272,7 +272,10 @@ class TestBedrockCheck:
         with (
             patch.dict("os.environ", {}, clear=True),
             patch("pathlib.Path.exists", return_value=True),
-            patch("pathlib.Path.read_text", return_value="[default]\naws_access_key_id=test"),
+            patch(
+                "pathlib.Path.read_text",
+                return_value="[default]\naws_access_key_id=test",
+            ),
             patch("litellm.completion") as mock_completion,
         ):
             # Mock successful API call
@@ -308,7 +311,9 @@ class TestCheckAllLLM:
                 available=True,
                 message="test",
             )
-            mock_git.return_value = ToolCheck(name="git", available=True, message="test")
+            mock_git.return_value = ToolCheck(
+                name="git", available=True, message="test"
+            )
 
             checker.check_all(
                 skip_sbom=True,
@@ -336,7 +341,9 @@ class TestCheckAllLLM:
             patch.object(checker, "check_llm_provider") as mock_provider,
             patch.object(checker, "check_git") as mock_git,
         ):
-            mock_git.return_value = ToolCheck(name="git", available=True, message="test")
+            mock_git.return_value = ToolCheck(
+                name="git", available=True, message="test"
+            )
 
             checker.check_all(
                 skip_sbom=True,

@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pytest
 
-from orisha.llm.prompts import (
+from chronicle.llm.prompts import (
     PLACEHOLDER_SUMMARIES,
     SYSTEM_PROMPTS,
     PromptContext,
@@ -21,7 +21,7 @@ from orisha.llm.prompts import (
     get_placeholder,
     get_system_prompt,
 )
-from orisha.models.analysis import (
+from chronicle.models.analysis import (
     AnalysisResult,
     Dependency,
     Framework,
@@ -48,7 +48,9 @@ class TestSystemPrompts:
     def test_system_prompts_contain_writing_rules(self) -> None:
         """Test that system prompts contain critical writing rules."""
         for section, prompt in SYSTEM_PROMPTS.items():
-            assert "CRITICAL WRITING RULES" in prompt, f"Section '{section}' missing writing rules"
+            assert (
+                "CRITICAL WRITING RULES" in prompt
+            ), f"Section '{section}' missing writing rules"
 
     def test_get_system_prompt_returns_correct_prompt(self) -> None:
         """Test get_system_prompt returns the correct prompt."""
@@ -88,7 +90,9 @@ class TestPlaceholderSummaries:
     def test_get_placeholder_generates_for_unknown_section(self) -> None:
         """Test get_placeholder generates sensible placeholder for unknown sections."""
         placeholder = get_placeholder("custom_section")
-        assert "Custom Section" in placeholder or "custom section" in placeholder.lower()
+        assert (
+            "Custom Section" in placeholder or "custom section" in placeholder.lower()
+        )
         assert "pending" in placeholder.lower()
 
 
@@ -135,13 +139,19 @@ class TestBuildOverviewPrompt:
             ],
             frameworks=[Framework(name="FastAPI"), Framework(name="React")],
             dependencies=[
-                Dependency(name="pytest", ecosystem="pypi", source_file="pyproject.toml"),
-                Dependency(name="boto3", ecosystem="pypi", source_file="pyproject.toml"),
+                Dependency(
+                    name="pytest", ecosystem="pypi", source_file="pyproject.toml"
+                ),
+                Dependency(
+                    name="boto3", ecosystem="pypi", source_file="pyproject.toml"
+                ),
             ],
         )
         return result
 
-    def test_build_overview_prompt_minimal(self, minimal_result: AnalysisResult) -> None:
+    def test_build_overview_prompt_minimal(
+        self, minimal_result: AnalysisResult
+    ) -> None:
         """Test building overview prompt with minimal data."""
         context = build_overview_prompt(minimal_result)
 
@@ -150,7 +160,9 @@ class TestBuildOverviewPrompt:
         assert "test-repo" in context.data["repository_name"]
         assert "Repository: test-repo" in context.data["facts"]
 
-    def test_build_overview_prompt_with_tech_stack(self, full_result: AnalysisResult) -> None:
+    def test_build_overview_prompt_with_tech_stack(
+        self, full_result: AnalysisResult
+    ) -> None:
         """Test building overview prompt includes technology stack."""
         context = build_overview_prompt(full_result)
 
@@ -187,8 +199,12 @@ class TestBuildTechStackPrompt:
                 Framework(name="Gin", version="1.9"),
             ],
             dependencies=[
-                Dependency(name="requests", ecosystem="pypi", source_file="requirements.txt"),
-                Dependency(name="boto3", ecosystem="pypi", source_file="requirements.txt"),
+                Dependency(
+                    name="requests", ecosystem="pypi", source_file="requirements.txt"
+                ),
+                Dependency(
+                    name="boto3", ecosystem="pypi", source_file="requirements.txt"
+                ),
             ],
         )
         return result
@@ -219,7 +235,9 @@ class TestBuildTechStackPrompt:
         """Test dependencies are limited to top 20."""
         # Add many dependencies
         result_with_stack.technology_stack.dependencies = [
-            Dependency(name=f"pkg-{i}", ecosystem="pypi", source_file="requirements.txt")
+            Dependency(
+                name=f"pkg-{i}", ecosystem="pypi", source_file="requirements.txt"
+            )
             for i in range(30)
         ]
 
@@ -487,7 +505,7 @@ class TestSubSectionPrompt:
 
     def test_subsection_prompt_creation(self) -> None:
         """Test SubSectionPrompt can be created with required fields."""
-        from orisha.llm.prompts import SubSectionPrompt
+        from chronicle.llm.prompts import SubSectionPrompt
 
         prompt = SubSectionPrompt(
             name="system_type",
@@ -501,7 +519,7 @@ class TestSubSectionPrompt:
 
     def test_subsection_prompt_with_facts_keys(self) -> None:
         """Test SubSectionPrompt with custom facts_keys."""
-        from orisha.llm.prompts import SubSectionPrompt
+        from chronicle.llm.prompts import SubSectionPrompt
 
         prompt = SubSectionPrompt(
             name="key_components",
@@ -519,7 +537,7 @@ class TestSectionDefinition:
 
     def test_section_definition_creation(self) -> None:
         """Test SectionDefinition can be created."""
-        from orisha.llm.prompts import SectionDefinition, SubSectionPrompt
+        from chronicle.llm.prompts import SectionDefinition, SubSectionPrompt
 
         section = SectionDefinition(
             section_name="overview",
@@ -535,7 +553,7 @@ class TestSectionDefinition:
 
     def test_section_definition_custom_strategy(self) -> None:
         """Test SectionDefinition with custom concatenation strategy."""
-        from orisha.llm.prompts import SectionDefinition, SubSectionPrompt
+        from chronicle.llm.prompts import SectionDefinition, SubSectionPrompt
 
         section = SectionDefinition(
             section_name="dependencies",
@@ -553,7 +571,7 @@ class TestSectionDefinitions:
 
     def test_all_sections_have_definitions(self) -> None:
         """Test that all required sections have definitions."""
-        from orisha.llm.prompts import SECTION_DEFINITIONS
+        from chronicle.llm.prompts import SECTION_DEFINITIONS
 
         required_sections = [
             "overview",
@@ -568,7 +586,7 @@ class TestSectionDefinitions:
 
     def test_overview_section_has_subsections(self) -> None:
         """Test overview section has appropriate sub-sections."""
-        from orisha.llm.prompts import SECTION_DEFINITIONS
+        from chronicle.llm.prompts import SECTION_DEFINITIONS
 
         overview = SECTION_DEFINITIONS["overview"]
         sub_names = [s.name for s in overview.sub_sections]
@@ -579,7 +597,7 @@ class TestSectionDefinitions:
 
     def test_dependencies_section_has_subsections(self) -> None:
         """Test dependencies section has appropriate sub-sections."""
-        from orisha.llm.prompts import SECTION_DEFINITIONS
+        from chronicle.llm.prompts import SECTION_DEFINITIONS
 
         deps = SECTION_DEFINITIONS["dependencies"]
         sub_names = [s.name for s in deps.sub_sections]
@@ -589,7 +607,7 @@ class TestSectionDefinitions:
 
     def test_get_section_definition_returns_definition(self) -> None:
         """Test get_section_definition returns correct definition."""
-        from orisha.llm.prompts import get_section_definition
+        from chronicle.llm.prompts import get_section_definition
 
         section = get_section_definition("overview")
         assert section is not None
@@ -597,7 +615,7 @@ class TestSectionDefinitions:
 
     def test_get_section_definition_returns_none_for_unknown(self) -> None:
         """Test get_section_definition returns None for unknown section."""
-        from orisha.llm.prompts import get_section_definition
+        from chronicle.llm.prompts import get_section_definition
 
         section = get_section_definition("unknown_section")
         assert section is None
@@ -608,7 +626,7 @@ class TestSubSectionResponse:
 
     def test_subsection_response_creation(self) -> None:
         """Test SubSectionResponse can be created."""
-        from orisha.llm.client import SubSectionResponse
+        from chronicle.llm.client import SubSectionResponse
 
         response = SubSectionResponse(sub_section_name="system_type")
 
@@ -621,14 +639,18 @@ class TestSubSectionResponse:
 
     def test_subsection_response_with_data(self) -> None:
         """Test SubSectionResponse with full data."""
-        from orisha.llm.client import SubSectionResponse
+        from chronicle.llm.client import SubSectionResponse
 
         response = SubSectionResponse(
             sub_section_name="key_components",
             facts_provided={"resources": ["lambda", "dynamodb"]},
             prompt_sent="What are the main components?",
             response_text="The system uses Lambda and DynamoDB.",
-            tokens_used={"prompt_tokens": 50, "completion_tokens": 20, "total_tokens": 70},
+            tokens_used={
+                "prompt_tokens": 50,
+                "completion_tokens": 20,
+                "total_tokens": 70,
+            },
         )
 
         assert response.facts_provided == {"resources": ["lambda", "dynamodb"]}
@@ -637,7 +659,7 @@ class TestSubSectionResponse:
 
     def test_subsection_response_with_error(self) -> None:
         """Test SubSectionResponse with error."""
-        from orisha.llm.client import SubSectionResponse
+        from chronicle.llm.client import SubSectionResponse
 
         response = SubSectionResponse(
             sub_section_name="failed_section",
@@ -653,7 +675,10 @@ class TestConcatenateSubsectionResponses:
 
     def test_concatenate_paragraph_strategy(self) -> None:
         """Test paragraph concatenation strategy."""
-        from orisha.llm.client import SubSectionResponse, concatenate_subsection_responses
+        from chronicle.llm.client import (
+            SubSectionResponse,
+            concatenate_subsection_responses,
+        )
 
         responses = [
             SubSectionResponse(
@@ -674,7 +699,10 @@ class TestConcatenateSubsectionResponses:
 
     def test_concatenate_bullet_strategy(self) -> None:
         """Test bullet concatenation strategy."""
-        from orisha.llm.client import SubSectionResponse, concatenate_subsection_responses
+        from chronicle.llm.client import (
+            SubSectionResponse,
+            concatenate_subsection_responses,
+        )
 
         responses = [
             SubSectionResponse(
@@ -694,7 +722,10 @@ class TestConcatenateSubsectionResponses:
 
     def test_concatenate_newline_strategy(self) -> None:
         """Test newline concatenation strategy."""
-        from orisha.llm.client import SubSectionResponse, concatenate_subsection_responses
+        from chronicle.llm.client import (
+            SubSectionResponse,
+            concatenate_subsection_responses,
+        )
 
         responses = [
             SubSectionResponse(
@@ -713,7 +744,10 @@ class TestConcatenateSubsectionResponses:
 
     def test_concatenate_filters_failed_responses(self) -> None:
         """Test that failed responses are filtered out."""
-        from orisha.llm.client import SubSectionResponse, concatenate_subsection_responses
+        from chronicle.llm.client import (
+            SubSectionResponse,
+            concatenate_subsection_responses,
+        )
 
         responses = [
             SubSectionResponse(
@@ -739,7 +773,10 @@ class TestConcatenateSubsectionResponses:
 
     def test_concatenate_returns_empty_for_all_failures(self) -> None:
         """Test empty result when all responses failed."""
-        from orisha.llm.client import SubSectionResponse, concatenate_subsection_responses
+        from chronicle.llm.client import (
+            SubSectionResponse,
+            concatenate_subsection_responses,
+        )
 
         responses = [
             SubSectionResponse(sub_section_name="failed1", error="Error 1"),
@@ -756,7 +793,7 @@ class TestFormatFacts:
 
     def test_format_simple_facts(self) -> None:
         """Test formatting simple string facts."""
-        from orisha.llm.client import _format_facts
+        from chronicle.llm.client import _format_facts
 
         facts = {
             "repository_name": "test-repo",
@@ -770,7 +807,7 @@ class TestFormatFacts:
 
     def test_format_list_facts(self) -> None:
         """Test formatting list facts."""
-        from orisha.llm.client import _format_facts
+        from chronicle.llm.client import _format_facts
 
         facts = {
             "ecosystems": ["npm", "pypi", "go"],
@@ -784,7 +821,7 @@ class TestFormatFacts:
 
     def test_format_dict_list_facts(self) -> None:
         """Test formatting list of dict facts."""
-        from orisha.llm.client import _format_facts
+        from chronicle.llm.client import _format_facts
 
         facts = {
             "languages": [
@@ -800,7 +837,7 @@ class TestFormatFacts:
 
     def test_format_empty_facts(self) -> None:
         """Test formatting empty facts dict."""
-        from orisha.llm.client import _format_facts
+        from chronicle.llm.client import _format_facts
 
         result = _format_facts({})
 

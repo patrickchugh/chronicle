@@ -1,1 +1,1 @@
-"""Integration tests for Orisha."""
+"""Integration tests for chronicle."""

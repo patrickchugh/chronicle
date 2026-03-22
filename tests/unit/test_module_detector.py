@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from orisha.analyzers.module_detector import ModuleDetector, detect_modules
+from chronicle.analyzers.module_detector import ModuleDetector, detect_modules
 
 
 class TestModuleDetector:
@@ -124,10 +124,12 @@ class TestModuleDetector:
         """Test that module files are correctly detected."""
         pkg = tmp_path / "mylib"
         pkg.mkdir()
-        (pkg / "__init__.py").write_text("""
+        (pkg / "__init__.py").write_text(
+            """
 from .core import CoreClass
 from .utils import helper_function
-""")
+"""
+        )
         (pkg / "core.py").write_text("class CoreClass: pass")
         (pkg / "utils.py").write_text("def helper_function(): pass")
 

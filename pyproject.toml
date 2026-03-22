@@ -3,14 +3,14 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "orisha"
+name = "chronicle"
 version = "0.1.0"
 description = "Automated system documentation generator for Enterprise IT audit, architecture, security and business stakeholders"
 readme = "README.md"
 license = "MPL-2.0"
 requires-python = ">=3.11"
 authors = [
-    { name = "Orisha Contributors" }
+    { name = "chronicle Contributors" }
 ]
 keywords = ["documentation", "audit", "architecture", "sbom", "ci-cd"]
 classifiers = [
@@ -52,15 +52,15 @@ bedrock = [
 ]
 
 [project.scripts]
-orisha = "orisha.cli:app"
+chronicle = "chronicle.cli:app"
 
 [project.urls]
-Homepage = "https://github.com/orisha/orisha"
-Documentation = "https://github.com/orisha/orisha#readme"
-Repository = "https://github.com/orisha/orisha"
+Homepage = "https://github.com/chronicle/chronicle"
+Documentation = "https://github.com/chronicle/chronicle#readme"
+Repository = "https://github.com/chronicle/chronicle"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/orisha"]
+packages = ["src/chronicle"]
 
 [tool.ruff]
 target-version = "py311"
@@ -86,7 +86,7 @@ ignore = [
 ]
 
 [tool.ruff.lint.isort]
-known-first-party = ["orisha"]
+known-first-party = ["chronicle"]
 
 [tool.ruff.format]
 quote-style = "double"

@@ -1,4 +1,4 @@
-"""Integration tests for Orisha CLI commands (T059, T060).
+"""Integration tests for chronicle CLI commands (T059, T060).
 
 These tests exercise the full CLI workflow against sample repositories.
 """
@@ -11,14 +11,14 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from orisha.cli import app
+from chronicle.cli import app
 from tests.fixtures import PYTHON_PROJECT_PATH
 
 runner = CliRunner()
 
 
-class TestOrishaWrite:
-    """Integration tests for `orisha write` command (T059)."""
+class TestchronicleWrite:
+    """Integration tests for `chronicle write` command (T059)."""
 
     @pytest.fixture
     def sample_repo(self) -> Path:
@@ -40,8 +40,10 @@ class TestOrishaWrite:
             app,
             [
                 "write",
-                "--repo", str(sample_repo),
-                "--output", str(output_path),
+                "--repo",
+                str(sample_repo),
+                "--output",
+                str(output_path),
                 "--skip-sbom",  # Skip external tools for CI
                 "--skip-architecture",  # Skip external tools for CI
                 "--skip-llm",  # Skip LLM for CI (no Ollama running)
@@ -70,8 +72,10 @@ class TestOrishaWrite:
             app,
             [
                 "write",
-                "--repo", str(sample_repo),
-                "--output", str(output_path),
+                "--repo",
+                str(sample_repo),
+                "--output",
+                str(output_path),
                 "--skip-sbom",
                 "--skip-architecture",
                 "--skip-llm",
@@ -94,8 +98,10 @@ class TestOrishaWrite:
             app,
             [
                 "write",
-                "--repo", str(sample_repo),
-                "--output", str(output_path),
+                "--repo",
+                str(sample_repo),
+                "--output",
+                str(output_path),
                 "--skip-sbom",
                 "--skip-architecture",
                 "--skip-llm",
@@ -118,8 +124,10 @@ class TestOrishaWrite:
             app,
             [
                 "write",
-                "--repo", str(sample_repo),
-                "--output", str(output_path),
+                "--repo",
+                str(sample_repo),
+                "--output",
+                str(output_path),
                 "--skip-sbom",
                 "--skip-architecture",
                 "--skip-llm",
@@ -146,8 +154,10 @@ class TestOrishaWrite:
             app,
             [
                 "write",
-                "--repo", str(sample_repo),
-                "--output", str(output_path),
+                "--repo",
+                str(sample_repo),
+                "--output",
+                str(output_path),
                 "--skip-sbom",
                 "--skip-architecture",
                 "--skip-llm",
@@ -166,8 +176,10 @@ class TestOrishaWrite:
             app,
             [
                 "write",
-                "--repo", "/nonexistent/path",
-                "--output", str(output_path),
+                "--repo",
+                "/nonexistent/path",
+                "--output",
+                str(output_path),
             ],
         )
 
@@ -175,8 +187,8 @@ class TestOrishaWrite:
         assert result.exit_code != 0
 
 
-class TestOrishaCheck:
-    """Integration tests for `orisha check` command (T060)."""
+class TestchronicleCheck:
+    """Integration tests for `chronicle check` command (T060)."""
 
     def test_check_runs_preflight(self) -> None:
         """Test that check command runs preflight validation."""
@@ -228,13 +240,14 @@ class TestOrishaCheck:
         assert result.exit_code in [0, 1, 2]
 
 
-class TestOrishaInit:
-    """Integration tests for `orisha init` command."""
+class TestchronicleInit:
+    """Integration tests for `chronicle init` command."""
 
     def test_init_creates_config(self, tmp_path: Path) -> None:
         """Test that init creates configuration files."""
         # Change to temp directory
         import os
+
         original_cwd = os.getcwd()
         os.chdir(tmp_path)
 
@@ -244,16 +257,16 @@ class TestOrishaInit:
             # Should succeed
             assert result.exit_code == 0
 
-            # Should create .orisha directory
-            orisha_dir = tmp_path / ".orisha"
-            assert orisha_dir.exists()
+            # Should create .chronicle directory
+            chronicle_dir = tmp_path / ".chronicle"
+            assert chronicle_dir.exists()
 
             # Should create config file
-            config_file = orisha_dir / "config.yaml"
+            config_file = chronicle_dir / "config.yaml"
             assert config_file.exists()
 
             # Should create sections directory
-            sections_dir = orisha_dir / "sections"
+            sections_dir = chronicle_dir / "sections"
             assert sections_dir.exists()
 
         finally:
@@ -262,6 +275,7 @@ class TestOrishaInit:
     def test_init_force_overwrites(self, tmp_path: Path) -> None:
         """Test that --force overwrites existing config."""
         import os
+
         original_cwd = os.getcwd()
         os.chdir(tmp_path)
 
@@ -270,7 +284,7 @@ class TestOrishaInit:
             runner.invoke(app, ["init", "--non-interactive"])
 
             # Modify config
-            config_file = tmp_path / ".orisha" / "config.yaml"
+            config_file = tmp_path / ".chronicle" / "config.yaml"
             config_file.write_text("# Modified")
 
             # Second init without force should fail
@@ -288,8 +302,8 @@ class TestOrishaInit:
             os.chdir(original_cwd)
 
 
-class TestOrishaValidate:
-    """Integration tests for `orisha validate` command."""
+class TestchronicleValidate:
+    """Integration tests for `chronicle validate` command."""
 
     def test_validate_valid_template(self, tmp_path: Path) -> None:
         """Test that validate accepts valid Jinja2 template."""

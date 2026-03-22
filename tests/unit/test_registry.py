@@ -1,16 +1,15 @@
 """Unit tests for ToolRegistry (T023l)."""
 
-
 import pytest
 
-from orisha.analyzers.base import ToolNotAvailableError
-from orisha.analyzers.diagrams.base import DiagramGenerator
-from orisha.analyzers.registry import (
+from chronicle.analyzers.base import ToolNotAvailableError
+from chronicle.analyzers.diagrams.base import DiagramGenerator
+from chronicle.analyzers.registry import (
     ToolRegistry,
     get_registry,
     reset_registry,
 )
-from orisha.analyzers.sbom.base import SBOMAdapter
+from chronicle.analyzers.sbom.base import SBOMAdapter
 
 
 class MockSBOMAdapter(SBOMAdapter):
@@ -223,7 +222,9 @@ class TestToolRegistry:
         registry.register_sbom_adapter("available", MockSBOMAdapter)
         registry.register_sbom_adapter("unavailable", MockSBOMAdapterUnavailable)
         registry.register_diagram_adapter("available", MockDiagramGenerator)
-        registry.register_diagram_adapter("unavailable", MockDiagramGeneratorUnavailable)
+        registry.register_diagram_adapter(
+            "unavailable", MockDiagramGeneratorUnavailable
+        )
 
         availability = registry.check_tool_availability()
 
@@ -236,7 +237,9 @@ class TestToolRegistry:
         """Test getting registry metadata."""
         registry = ToolRegistry()
         registry.register_sbom_adapter("syft", MockSBOMAdapter, is_default=True)
-        registry.register_diagram_adapter("terravision", MockDiagramGenerator, is_default=True)
+        registry.register_diagram_adapter(
+            "terravision", MockDiagramGenerator, is_default=True
+        )
 
         metadata = registry.get_metadata()
 

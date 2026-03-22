@@ -5,7 +5,7 @@
 
 ## Overview
 
-This contract defines the cache file format and API for Orisha's incremental documentation updates feature. The cache stores LLM-generated **module summaries** and **section summaries** to avoid redundant API calls on subsequent runs.
+This contract defines the cache file format and API for chronicle's incremental documentation updates feature. The cache stores LLM-generated **module summaries** and **section summaries** to avoid redundant API calls on subsequent runs.
 
 > **Note**: Version 2.0 caches module-level summaries (flow-based documentation) instead of function-level explanations. This aligns with Phase 4e which replaced function-by-function explanations with module-level documentation.
 
@@ -13,7 +13,7 @@ This contract defines the cache file format and API for Orisha's incremental doc
 
 ## Cache File Location
 
-**Default**: `.orisha/cache.json` in repository root
+**Default**: `.chronicle/cache.json` in repository root
 
 **Custom**: Override via `--cache-path PATH` CLI flag
 
@@ -30,39 +30,39 @@ This contract defines the cache file format and API for Orisha's incremental doc
 ```json
 {
   "version": "2.0",
-  "orisha_version": "0.1.0",
+  "chronicle_version": "0.1.0",
   "llm_model": "anthropic/claude-3-5-sonnet",
   "git_ref": "abc123def456789",
   "created_at": "2026-02-01T12:00:00Z",
   "updated_at": "2026-02-01T14:30:00Z",
   "modules": {
-    "src/orisha/analyzers": {
+    "src/chronicle/analyzers": {
       "name": "analyzers",
-      "path": "src/orisha/analyzers",
+      "path": "src/chronicle/analyzers",
       "responsibility": "Performs deterministic code analysis including AST parsing, dependency detection, and SBOM generation.",
       "created_at": "2026-02-01T12:00:00Z",
-      "orisha_version": "0.1.0"
+      "chronicle_version": "0.1.0"
     },
-    "src/orisha/llm": {
+    "src/chronicle/llm": {
       "name": "llm",
-      "path": "src/orisha/llm",
+      "path": "src/chronicle/llm",
       "responsibility": "Provides unified LLM access via LiteLLM for generating documentation summaries.",
       "created_at": "2026-02-01T12:00:00Z",
-      "orisha_version": "0.1.0"
+      "chronicle_version": "0.1.0"
     }
   },
   "section_summaries": {
     "overview": {
-      "content": "Orisha is an automated system documentation generator...",
+      "content": "chronicle is an automated system documentation generator...",
       "input_hash": "sha256:789abc...",
       "created_at": "2026-02-01T12:00:00Z",
-      "orisha_version": "0.1.0"
+      "chronicle_version": "0.1.0"
     },
     "tech_stack": {
       "content": "The system uses Python 3.11+ with tree-sitter for AST parsing...",
       "input_hash": "sha256:cde012...",
       "created_at": "2026-02-01T12:00:00Z",
-      "orisha_version": "0.1.0"
+      "chronicle_version": "0.1.0"
     }
   }
 }
@@ -77,7 +77,7 @@ This contract defines the cache file format and API for Orisha's incremental doc
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | version | string | Yes | Cache format version (e.g., "2.0") |
-| orisha_version | string | Yes | Orisha version that created/updated the cache |
+| chronicle_version | string | Yes | chronicle version that created/updated the cache |
 | llm_model | string | Yes | LLM model used for summaries |
 | git_ref | string | Yes | Git commit SHA when cache was last updated |
 | created_at | ISO 8601 | Yes | Initial cache creation timestamp |
@@ -93,7 +93,7 @@ This contract defines the cache file format and API for Orisha's incremental doc
 | path | string | Yes | Relative path from repo root |
 | responsibility | string | Yes | LLM-generated 1-2 sentence module responsibility |
 | created_at | ISO 8601 | Yes | When this entry was created |
-| orisha_version | string | Yes | Orisha version that generated this entry |
+| chronicle_version | string | Yes | chronicle version that generated this entry |
 
 ### SectionCacheEntry (section_summaries values)
 
@@ -102,7 +102,7 @@ This contract defines the cache file format and API for Orisha's incremental doc
 | content | string | Yes | LLM-generated section content |
 | input_hash | string | Yes | SHA-256 hash of input data used to generate this section |
 | created_at | ISO 8601 | Yes | When this entry was created |
-| orisha_version | string | Yes | Orisha version that generated this entry |
+| chronicle_version | string | Yes | chronicle version that generated this entry |
 
 ---
 
@@ -111,9 +111,9 @@ This contract defines the cache file format and API for Orisha's incremental doc
 **Module entries** are keyed by module path: `{module_path}`
 
 Examples:
-- `src/orisha/analyzers`
-- `src/orisha/llm`
-- `src/orisha/renderers`
+- `src/chronicle/analyzers`
+- `src/chronicle/llm`
+- `src/chronicle/renderers`
 
 **Section entries** are keyed by section name: `{section_name}`
 
@@ -167,7 +167,7 @@ Discard entire cache when:
 | Condition | Reason |
 |-----------|--------|
 | `cache.version != CURRENT_CACHE_VERSION` | Cache format changed |
-| `cache.orisha_version != __version__` | Orisha updated, prompts may differ |
+| `cache.chronicle_version != __version__` | chronicle updated, prompts may differ |
 | `cache.llm_model != config.llm.model` | Different model = different summaries |
 
 ### Module-Level Invalidation
@@ -197,7 +197,7 @@ Invalidate a section's cached content when:
 |------|-------------|---------|
 | `--no-cache` | Disable cache, force full regeneration | false |
 | `--clear-cache` | Delete existing cache before running | false |
-| `--cache-path PATH` | Custom cache file location | `.orisha/cache.json` |
+| `--cache-path PATH` | Custom cache file location | `.chronicle/cache.json` |
 
 ---
 
@@ -214,13 +214,13 @@ Invalidate a section's cached content when:
 ### Verbose Mode
 
 ```
-[INFO] Cache file: .orisha/cache.json (created 2026-02-01)
+[INFO] Cache file: .chronicle/cache.json (created 2026-02-01)
 [INFO] Loaded 10 module summaries + 5 section summaries (git_ref: abc123)
 [INFO] Running git diff --name-only abc123...
-[DEBUG] Changed files: src/orisha/pipeline.py, src/orisha/cli.py (5 total)
-[DEBUG] Module src/orisha/analyzers: unchanged (reusing cached summary)
-[DEBUG] Module src/orisha/llm: changed (regenerating summary)
-[DEBUG] Module src/orisha/renderers: changed (regenerating summary)
+[DEBUG] Changed files: src/chronicle/pipeline.py, src/chronicle/cli.py (5 total)
+[DEBUG] Module src/chronicle/analyzers: unchanged (reusing cached summary)
+[DEBUG] Module src/chronicle/llm: changed (regenerating summary)
+[DEBUG] Module src/chronicle/renderers: changed (regenerating summary)
 [INFO] Cache hit rate: 80% (8/10 module summaries reused)
 [INFO] Generating 2 module summaries + 1 section summary
 [INFO] Saved updated cache (git_ref: def456, 10 modules, 5 sections)
@@ -272,7 +272,7 @@ Invalidate a section's cached content when:
 2. If lock fails after 5 seconds: proceed without cache (log warning)
 3. Release lock after writing
 
-**Rationale**: Orisha typically runs once per commit in CI/CD. Graceful degradation ensures correctness (duplicate work, not corruption).
+**Rationale**: chronicle typically runs once per commit in CI/CD. Graceful degradation ensures correctness (duplicate work, not corruption).
 
 ---
 

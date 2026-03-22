@@ -4,7 +4,10 @@ from pathlib import Path
 
 import pytest
 
-from orisha.analyzers.integrations import IntegrationDetector, detect_external_integrations
+from chronicle.analyzers.integrations import (
+    IntegrationDetector,
+    detect_external_integrations,
+)
 
 
 class TestIntegrationDetector:
@@ -18,7 +21,8 @@ class TestIntegrationDetector:
     def test_detect_python_requests(self, tmp_path: Path) -> None:
         """Test detecting Python requests library calls."""
         py_file = tmp_path / "client.py"
-        py_file.write_text('''
+        py_file.write_text(
+            """
 import requests
 
 def fetch_data():
@@ -27,7 +31,8 @@ def fetch_data():
 
 def post_data(payload):
     return requests.post("https://api.example.com/submit", json=payload)
-''')
+"""
+        )
 
         detector = IntegrationDetector(tmp_path)
         integrations = detector.detect_external_integrations()
@@ -39,14 +44,16 @@ def post_data(payload):
     def test_detect_python_httpx(self, tmp_path: Path) -> None:
         """Test detecting Python httpx library calls."""
         py_file = tmp_path / "async_client.py"
-        py_file.write_text('''
+        py_file.write_text(
+            """
 import httpx
 
 async def fetch_async():
     async with httpx.AsyncClient() as client:
         response = await client.get("https://api.example.com/data")
         return response.json()
-''')
+"""
+        )
 
         detector = IntegrationDetector(tmp_path)
         integrations = detector.detect_external_integrations()
@@ -57,7 +64,8 @@ async def fetch_async():
     def test_detect_sqlalchemy(self, tmp_path: Path) -> None:
         """Test detecting SQLAlchemy database connections."""
         py_file = tmp_path / "database.py"
-        py_file.write_text('''
+        py_file.write_text(
+            """
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -66,7 +74,8 @@ Session = sessionmaker(bind=engine)
 
 def get_session():
     return Session()
-''')
+"""
+        )
 
         detector = IntegrationDetector(tmp_path)
         integrations = detector.detect_external_integrations()
@@ -77,14 +86,16 @@ def get_session():
     def test_detect_redis(self, tmp_path: Path) -> None:
         """Test detecting Redis cache connections."""
         py_file = tmp_path / "cache.py"
-        py_file.write_text('''
+        py_file.write_text(
+            """
 import redis
 
 client = redis.Redis(host="localhost", port=6379)
 
 def get_cached(key):
     return client.get(key)
-''')
+"""
+        )
 
         detector = IntegrationDetector(tmp_path)
         integrations = detector.detect_external_integrations()
@@ -95,7 +106,8 @@ def get_cached(key):
     def test_detect_boto3_s3(self, tmp_path: Path) -> None:
         """Test detecting AWS S3 storage via boto3."""
         py_file = tmp_path / "storage.py"
-        py_file.write_text('''
+        py_file.write_text(
+            """
 import boto3
 from boto3 import s3
 
@@ -104,7 +116,8 @@ def upload_file(bucket, key, data):
 
 def download_file(bucket, key):
     return s3.download_file(bucket, key)
-''')
+"""
+        )
 
         detector = IntegrationDetector(tmp_path)
         integrations = detector.detect_external_integrations()
@@ -116,12 +129,14 @@ def download_file(bucket, key):
     def test_detect_boto3_sqs(self, tmp_path: Path) -> None:
         """Test detecting AWS SQS queue via boto3."""
         py_file = tmp_path / "queue.py"
-        py_file.write_text('''
+        py_file.write_text(
+            """
 from boto3 import sqs
 
 def send_message(queue_url, message):
     sqs.send_message(QueueUrl=queue_url, MessageBody=message)
-''')
+"""
+        )
 
         detector = IntegrationDetector(tmp_path)
         integrations = detector.detect_external_integrations()
@@ -133,7 +148,8 @@ def send_message(queue_url, message):
     def test_detect_javascript_axios(self, tmp_path: Path) -> None:
         """Test detecting JavaScript axios HTTP calls."""
         js_file = tmp_path / "api.js"
-        js_file.write_text('''
+        js_file.write_text(
+            """
 import axios from 'axios';
 
 async function fetchUsers() {
@@ -144,7 +160,8 @@ async function fetchUsers() {
 async function createUser(user) {
     return axios.post('/api/users', user);
 }
-''')
+"""
+        )
 
         detector = IntegrationDetector(tmp_path)
         integrations = detector.detect_external_integrations()
@@ -156,14 +173,16 @@ async function createUser(user) {
     def test_detect_javascript_fetch(self, tmp_path: Path) -> None:
         """Test detecting JavaScript fetch API calls."""
         js_file = tmp_path / "client.js"
-        js_file.write_text('''
+        js_file.write_text(
+            """
 import fetch from 'node-fetch';
 
 async function getData() {
     const response = await fetch('https://api.example.com/data');
     return response.json();
 }
-''')
+"""
+        )
 
         detector = IntegrationDetector(tmp_path)
         integrations = detector.detect_external_integrations()
@@ -175,7 +194,8 @@ async function getData() {
     def test_detect_prisma(self, tmp_path: Path) -> None:
         """Test detecting Prisma database client."""
         ts_file = tmp_path / "db.ts"
-        ts_file.write_text('''
+        ts_file.write_text(
+            """
 import { PrismaClient } from 'prisma';
 
 const prisma = new PrismaClient();
@@ -183,7 +203,8 @@ const prisma = new PrismaClient();
 async function getUsers() {
     return prisma.user.findMany();
 }
-''')
+"""
+        )
 
         detector = IntegrationDetector(tmp_path)
         integrations = detector.detect_external_integrations()
@@ -195,14 +216,16 @@ async function getUsers() {
     def test_detect_kafka(self, tmp_path: Path) -> None:
         """Test detecting Kafka queue integration."""
         py_file = tmp_path / "producer.py"
-        py_file.write_text('''
+        py_file.write_text(
+            """
 from kafka import KafkaProducer
 
 producer = KafkaProducer(bootstrap_servers='localhost:9092')
 
 def send_event(topic, message):
     producer.send(topic, message.encode())
-''')
+"""
+        )
 
         detector = IntegrationDetector(tmp_path)
         integrations = detector.detect_external_integrations()
@@ -213,7 +236,8 @@ def send_event(topic, message):
     def test_detect_rabbitmq(self, tmp_path: Path) -> None:
         """Test detecting RabbitMQ queue integration."""
         py_file = tmp_path / "consumer.py"
-        py_file.write_text('''
+        py_file.write_text(
+            """
 import pika
 
 connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
@@ -221,7 +245,8 @@ channel = connection.channel()
 
 def consume_messages(queue):
     channel.basic_consume(queue=queue, on_message_callback=callback)
-''')
+"""
+        )
 
         detector = IntegrationDetector(tmp_path)
         integrations = detector.detect_external_integrations()
@@ -232,7 +257,8 @@ def consume_messages(queue):
     def test_multiple_integrations_single_file(self, tmp_path: Path) -> None:
         """Test detecting multiple integration types in single file."""
         py_file = tmp_path / "service.py"
-        py_file.write_text('''
+        py_file.write_text(
+            """
 import requests
 import redis
 from sqlalchemy import create_engine
@@ -244,7 +270,8 @@ def process():
     data = requests.get("https://api.example.com/data").json()
     cache.set("data", data)
     # Store in DB...
-''')
+"""
+        )
 
         detector = IntegrationDetector(tmp_path)
         integrations = detector.detect_external_integrations()
@@ -283,10 +310,12 @@ def process():
     def test_convenience_function(self, tmp_path: Path) -> None:
         """Test the detect_external_integrations convenience function."""
         py_file = tmp_path / "client.py"
-        py_file.write_text('''
+        py_file.write_text(
+            """
 import requests
 response = requests.get("http://example.com")
-''')
+"""
+        )
 
         integrations = detect_external_integrations(tmp_path)
 
@@ -295,12 +324,14 @@ response = requests.get("http://example.com")
     def test_deduplicate_integrations(self, tmp_path: Path) -> None:
         """Test that integrations are deduplicated by (name, type, library)."""
         py_file = tmp_path / "client.py"
-        py_file.write_text('''
+        py_file.write_text(
+            """
 import requests
 
 requests.get("https://api.example.com")
 requests.get("https://api.example.com")
-''')
+"""
+        )
 
         detector = IntegrationDetector(tmp_path)
         integrations = detector.detect_external_integrations()

@@ -12,9 +12,9 @@ from pathlib import Path
 
 import pytest
 
-from orisha.config import LLMConfig, OrishaConfig, OutputConfig, ToolConfig
-from orisha.models import Repository
-from orisha.pipeline import AnalysisPipeline, PipelineOptions
+from chronicle.config import LLMConfig, chronicleConfig, OutputConfig, ToolConfig
+from chronicle.models import Repository
+from chronicle.pipeline import AnalysisPipeline, PipelineOptions
 
 
 class TestFlowBasedDocumentation:
@@ -29,7 +29,8 @@ class TestFlowBasedDocumentation:
         (pkg / "__init__.py").write_text("")
 
         # CLI module with entry points
-        (pkg / "cli.py").write_text('''
+        (pkg / "cli.py").write_text(
+            '''
 """CLI module."""
 import typer
 
@@ -42,10 +43,12 @@ def hello(name: str):
 
 if __name__ == "__main__":
     app()
-''')
+'''
+        )
 
         # API module with endpoints
-        (pkg / "api.py").write_text('''
+        (pkg / "api.py").write_text(
+            '''
 """API endpoints."""
 from fastapi import FastAPI
 
@@ -60,19 +63,23 @@ def list_users():
 def create_user(user: dict):
     """Create a user."""
     return user
-''')
+'''
+        )
 
         # Utils module
-        (pkg / "utils.py").write_text('''
+        (pkg / "utils.py").write_text(
+            '''
 """Utility functions."""
 
 def helper_function():
     """A helper function."""
     return True
-''')
+'''
+        )
 
         # Services with external integrations
-        (pkg / "services.py").write_text('''
+        (pkg / "services.py").write_text(
+            '''
 """Service layer with external integrations."""
 import requests
 import redis
@@ -91,21 +98,22 @@ def fetch_data():
 def get_cached_value(key):
     """Get cached value."""
     return cache.get(key)
-''')
+'''
+        )
 
         return Repository(path=tmp_path, name="test-myapp")
 
     @pytest.fixture
-    def config(self) -> OrishaConfig:
+    def config(self) -> chronicleConfig:
         """Create test configuration with LLM disabled."""
-        return OrishaConfig(
+        return chronicleConfig(
             output=OutputConfig(path=Path("docs/system.md")),
             tools=ToolConfig(),
             llm=LLMConfig(enabled=False),
         )
 
     def test_pipeline_runs_flow_docs(
-        self, python_repo: Repository, config: OrishaConfig
+        self, python_repo: Repository, config: chronicleConfig
     ) -> None:
         """Test that pipeline runs flow-based documentation stages."""
         pipeline = AnalysisPipeline(config)
@@ -123,7 +131,7 @@ def get_cached_value(key):
         assert result.external_integrations is not None
 
     def test_module_detection(
-        self, python_repo: Repository, config: OrishaConfig
+        self, python_repo: Repository, config: chronicleConfig
     ) -> None:
         """Test that modules are correctly detected."""
         pipeline = AnalysisPipeline(config)
@@ -141,7 +149,7 @@ def get_cached_value(key):
         assert any("myapp" in name for name in module_names)
 
     def test_entry_point_detection(
-        self, python_repo: Repository, config: OrishaConfig
+        self, python_repo: Repository, config: chronicleConfig
     ) -> None:
         """Test that entry points are correctly detected."""
         pipeline = AnalysisPipeline(config)
@@ -161,7 +169,7 @@ def get_cached_value(key):
         assert len(ep_types) >= 1
 
     def test_external_integration_detection(
-        self, python_repo: Repository, config: OrishaConfig
+        self, python_repo: Repository, config: chronicleConfig
     ) -> None:
         """Test that external integrations are correctly detected."""
         pipeline = AnalysisPipeline(config)
@@ -181,7 +189,7 @@ def get_cached_value(key):
         assert "http" in integration_types
 
     def test_mermaid_diagram_generation(
-        self, python_repo: Repository, config: OrishaConfig
+        self, python_repo: Repository, config: chronicleConfig
     ) -> None:
         """Test that Mermaid diagram is generated."""
         pipeline = AnalysisPipeline(config)
@@ -199,7 +207,7 @@ def get_cached_value(key):
             assert result.module_flow_diagram.node_count >= 0
 
     def test_skip_flow_docs_option(
-        self, python_repo: Repository, config: OrishaConfig
+        self, python_repo: Repository, config: chronicleConfig
     ) -> None:
         """Test that skip_flow_docs option bypasses flow-based documentation."""
         pipeline = AnalysisPipeline(config)
@@ -233,16 +241,16 @@ class TestFlowDocsReproducibility:
         return Repository(path=tmp_path, name="test-app")
 
     @pytest.fixture
-    def config(self) -> OrishaConfig:
+    def config(self) -> chronicleConfig:
         """Create test configuration."""
-        return OrishaConfig(
+        return chronicleConfig(
             output=OutputConfig(path=Path("docs/system.md")),
             tools=ToolConfig(),
             llm=LLMConfig(enabled=False),
         )
 
     def test_consecutive_runs_produce_identical_flow_docs(
-        self, sample_repo: Repository, config: OrishaConfig
+        self, sample_repo: Repository, config: chronicleConfig
     ) -> None:
         """Test that flow-based documentation is reproducible across runs."""
         pipeline = AnalysisPipeline(config)
@@ -269,4 +277,7 @@ class TestFlowDocsReproducibility:
 
         # Mermaid diagrams should be identical
         if result1.module_flow_diagram and result2.module_flow_diagram:
-            assert result1.module_flow_diagram.mermaid == result2.module_flow_diagram.mermaid
+            assert (
+                result1.module_flow_diagram.mermaid
+                == result2.module_flow_diagram.mermaid
+            )

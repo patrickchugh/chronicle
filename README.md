@@ -1,4 +1,4 @@
-# Orisha
+# chronicle
 
 Automated system documentation generator for Enterprise IT audit, architecture, security, and business stakeholders.
 
@@ -14,20 +14,20 @@ Automated system documentation generator for Enterprise IT audit, architecture, 
 ## Installation
 
 ```bash
-pip install orisha
+pip install chronicle
 ```
 
 ## Quick Start
 
 ```bash
 # Initialize configuration
-orisha init
+chronicle init
 
 # Check tool availability
-orisha check
+chronicle check
 
 # Generate documentation
-orisha write --repo .
+chronicle write --repo .
 ```
 
 ## Documentation

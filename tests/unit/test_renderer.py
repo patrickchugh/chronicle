@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from orisha.models.analysis import (
+from chronicle.models.analysis import (
     AnalysisResult,
     AnalysisStatus,
     Dependency,
@@ -13,7 +13,7 @@ from orisha.models.analysis import (
     TechnologyStack,
     VersionEntry,
 )
-from orisha.templates import DocumentRenderer, SectionLoader
+from chronicle.templates import DocumentRenderer, SectionLoader
 
 
 class TestSectionLoader:
@@ -154,7 +154,7 @@ class TestDocumentRenderer:
         assert "Version History" in content
         assert "1.0.0" in content
         assert "Initial documentation" in content
-        assert "Orisha" in content
+        assert "chronicle" in content
 
     def test_render_to_file(
         self,
@@ -209,13 +209,15 @@ class TestDocumentRenderer:
         sample_result: AnalysisResult,
     ) -> None:
         """Test rendering with analysis errors."""
-        from orisha.models import AnalysisError
+        from chronicle.models import AnalysisError
 
-        sample_result.add_error(AnalysisError(
-            component="sbom",
-            message="Syft not installed",
-            recoverable=True,
-        ))
+        sample_result.add_error(
+            AnalysisError(
+                component="sbom",
+                message="Syft not installed",
+                recoverable=True,
+            )
+        )
 
         content = renderer.render(sample_result)
 

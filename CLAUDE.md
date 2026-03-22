@@ -1,4 +1,4 @@
-# orisha Development Guidelines
+# chronicle Development Guidelines
 
 Auto-generated from all feature plans. Last updated: 2026-01-31
 
@@ -6,7 +6,7 @@ Auto-generated from all feature plans. Last updated: 2026-01-31
 - Python 3.11+ (primary language for CLI, AST parsing, LLM integration) + ree-sitter (AST), LiteLLM (LLM), Jinja2 (templates) (001-system-doc-generator)
 - N/A (stateless analysis) (001-system-doc-generator)
 - Python 3.11+ (existing codebase) + hashlib (stdlib), json (stdlib), pathlib (stdlib), git integration (existing) (001-system-doc-generator)
-- `.orisha/cache.json` - JSON cache file in repository (001-system-doc-generator)
+- `.chronicle/cache.json` - JSON cache file in repository (001-system-doc-generator)
 
 - Python 3.11+ (primary language for CLI, AST parsing, LLM integration) (001-system-doc-generator)
 
@@ -21,7 +21,7 @@ tests/
 
  pytest
  ruff check .
- uv run orisha
+ uv run chronicle
 
 ## Code Style
 

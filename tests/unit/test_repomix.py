@@ -4,7 +4,7 @@ import pytest
 from pathlib import Path
 from datetime import datetime, UTC
 
-from orisha.models.canonical import CompressedCodebase, HolisticOverview
+from chronicle.models.canonical import CompressedCodebase, HolisticOverview
 
 
 class TestCompressedCodebase:
@@ -51,7 +51,7 @@ class TestHolisticOverview:
 
     def test_create_holistic_overview(self) -> None:
         """Test creating a HolisticOverview instance."""
-        from orisha.models.canonical.compressed import ExternalIntegrationInfo
+        from chronicle.models.canonical.compressed import ExternalIntegrationInfo
 
         overview = HolisticOverview(
             purpose="A CLI tool for documentation generation",
@@ -60,10 +60,14 @@ class TestHolisticOverview:
             data_flow="Repository -> Pipeline -> Documentation",
             design_patterns=["Adapter", "Pipeline"],
             external_integrations=[
-                ExternalIntegrationInfo(name="LiteLLM", type="LLM", purpose="LLM provider"),
-                ExternalIntegrationInfo(name="Syft", type="Tool", purpose="SBOM generation"),
+                ExternalIntegrationInfo(
+                    name="LiteLLM", type="LLM", purpose="LLM provider"
+                ),
+                ExternalIntegrationInfo(
+                    name="Syft", type="Tool", purpose="SBOM generation"
+                ),
             ],
-            entry_points=["orisha write", "orisha check"],
+            entry_points=["chronicle write", "chronicle check"],
         )
 
         assert "documentation" in overview.purpose.lower()
@@ -120,7 +124,7 @@ class TestRepomixAdapter:
 
     def test_default_exclude_patterns(self) -> None:
         """Test that default exclude patterns are defined."""
-        from orisha.analyzers.repomix.adapter import DEFAULT_EXCLUDE_PATTERNS
+        from chronicle.analyzers.repomix.adapter import DEFAULT_EXCLUDE_PATTERNS
 
         # Should have common exclusions
         assert "tests/*" in DEFAULT_EXCLUDE_PATTERNS
@@ -130,7 +134,10 @@ class TestRepomixAdapter:
 
     def test_adapter_initialization(self) -> None:
         """Test RepomixAdapter initialization."""
-        from orisha.analyzers.repomix.adapter import RepomixAdapter, DEFAULT_EXCLUDE_PATTERNS
+        from chronicle.analyzers.repomix.adapter import (
+            RepomixAdapter,
+            DEFAULT_EXCLUDE_PATTERNS,
+        )
 
         try:
             adapter = RepomixAdapter()
@@ -142,7 +149,7 @@ class TestRepomixAdapter:
 
     def test_adapter_custom_excludes(self) -> None:
         """Test RepomixAdapter with custom exclude patterns."""
-        from orisha.analyzers.repomix.adapter import RepomixAdapter
+        from chronicle.analyzers.repomix.adapter import RepomixAdapter
 
         try:
             adapter = RepomixAdapter(exclude_patterns=["custom/*"])

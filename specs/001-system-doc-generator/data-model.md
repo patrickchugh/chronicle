@@ -1,4 +1,4 @@
-# Data Model: Orisha
+# Data Model: chronicle
 
 **Date**: 2026-01-31
 **Branch**: `001-system-doc-generator`
@@ -205,7 +205,7 @@ A single entry in the document version history (SC-011).
 |-------|------|----------|-------------|
 | version | `str` | Yes | Version identifier |
 | timestamp | `datetime` | Yes | Change timestamp (UTC) |
-| author | `str` | Yes | Author: "Orisha" or human name |
+| author | `str` | Yes | Author: "chronicle" or human name |
 | author_type | `str` | Yes | Type: "automated" or "human" |
 | changes | `str` | Yes | Summary of changes |
 | git_ref | `str \| None` | No | Git commit SHA for this version |
@@ -227,7 +227,7 @@ Non-fatal error encountered during analysis.
 
 ## Canonical Data Formats (Principle V: Tool Agnosticism)
 
-These are the **standard internal formats** that all tool adapters MUST produce. The rest of Orisha only works with these canonical formats, never with tool-specific output. This enables true tool swappability.
+These are the **standard internal formats** that all tool adapters MUST produce. The rest of chronicle only works with these canonical formats, never with tool-specific output. This enables true tool swappability.
 
 ### CanonicalSBOM
 
@@ -568,16 +568,16 @@ Configuration for a human-authored section that merges with generated content.
 ```yaml
 sections:
   overview:
-    file: ".orisha/sections/overview.md"
+    file: ".chronicle/sections/overview.md"
     strategy: "prepend"
   security:
-    file: ".orisha/sections/security.md"
+    file: ".chronicle/sections/security.md"
     strategy: "append"
 ```
 
 **File Structure:**
 ```
-.orisha/
+.chronicle/
 ├── config.yaml
 └── sections/
     ├── overview.md
@@ -588,7 +588,7 @@ sections:
 
 ## Configuration Schema
 
-### OrishaConfig
+### chronicleConfig
 
 Top-level configuration loaded from YAML file. CLI provides only per-run overrides (`--output`, `--format`, `--ci`).
 
@@ -614,8 +614,8 @@ Tool selection configuration. Tools are auto-skipped if not applicable (no depen
 
 **Configuration File Locations** (in priority order):
 1. CLI `--config` argument
-2. `./.orisha/config.yaml`
-3. `./orisha.yaml`
+2. `./.chronicle/config.yaml`
+3. `./chronicle.yaml`
 
 ---
 

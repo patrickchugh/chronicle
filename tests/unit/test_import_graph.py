@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from orisha.analyzers.import_graph import ImportGraphBuilder, build_import_graph
-from orisha.models.canonical.ast import CanonicalAST, CanonicalModule
+from chronicle.analyzers.import_graph import ImportGraphBuilder, build_import_graph
+from chronicle.models.canonical.ast import CanonicalAST, CanonicalModule
 
 
 class TestImportGraphBuilder:
@@ -98,7 +98,9 @@ class TestImportGraphBuilder:
         assert "com/myapp/services" in modules
 
         # Static import - the package includes the class name
-        modules = builder._parse_java_import("import static com.myapp.util.Constants.MAX;")
+        modules = builder._parse_java_import(
+            "import static com.myapp.util.Constants.MAX;"
+        )
         assert any("com/myapp/util" in m for m in modules)
 
     def test_internal_module_identification(self, tmp_path: Path) -> None:
@@ -192,10 +194,7 @@ class TestImportGraphBuilder:
         graph = builder.build_import_graph(ast)
 
         # Count edges from main to utils
-        edge_count = sum(
-            1 for s, t in graph.edges
-            if "main" in s and "utils" in t
-        )
+        edge_count = sum(1 for s, t in graph.edges if "main" in s and "utils" in t)
         # Should have at most 1 edge (deduplicated)
         assert edge_count <= 1
 

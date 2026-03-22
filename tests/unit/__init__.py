@@ -1,1 +1,1 @@
-"""Unit tests for Orisha."""
+"""Unit tests for chronicle."""

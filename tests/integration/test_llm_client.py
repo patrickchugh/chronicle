@@ -8,8 +8,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from orisha.llm.client import LLMClient, LLMError, LLMResponse, create_client
-from orisha.models.llm_config import LLMConfig
+from chronicle.llm.client import LLMClient, LLMError, LLMResponse, create_client
+from chronicle.models.llm_config import LLMConfig
 
 
 class TestLLMClientCreation:
@@ -97,7 +97,9 @@ class TestLLMClientCompletion:
         )
         client = LLMClient(config)
 
-        with patch("litellm.completion", return_value=mock_litellm_response) as mock_call:
+        with patch(
+            "litellm.completion", return_value=mock_litellm_response
+        ) as mock_call:
             response = client.complete("Hello, world!")
 
             mock_call.assert_called_once()
@@ -121,7 +123,9 @@ class TestLLMClientCompletion:
         )
         client = LLMClient(config)
 
-        with patch("litellm.completion", return_value=mock_litellm_response) as mock_call:
+        with patch(
+            "litellm.completion", return_value=mock_litellm_response
+        ) as mock_call:
             response = client.complete(
                 "Hello!",
                 system_prompt="You are a helpful assistant.",
@@ -146,7 +150,9 @@ class TestLLMClientCompletion:
         )
         client = LLMClient(config)
 
-        with patch("litellm.completion", return_value=mock_litellm_response) as mock_call:
+        with patch(
+            "litellm.completion", return_value=mock_litellm_response
+        ) as mock_call:
             client.complete("Hello!", max_tokens=100)
 
             call_kwargs = mock_call.call_args[1]
@@ -164,7 +170,9 @@ class TestLLMClientCompletion:
         )
         client = LLMClient(config)
 
-        with patch("litellm.completion", return_value=mock_litellm_response) as mock_call:
+        with patch(
+            "litellm.completion", return_value=mock_litellm_response
+        ) as mock_call:
             client.complete("Hello!")
 
             call_kwargs = mock_call.call_args[1]
@@ -292,9 +300,7 @@ class TestLLMClientSummarize:
         )
         return mock_response
 
-    def test_summarize_returns_content(
-        self, mock_litellm_response: MagicMock
-    ) -> None:
+    def test_summarize_returns_content(self, mock_litellm_response: MagicMock) -> None:
         """Test summarize returns the generated summary."""
         config = LLMConfig(
             provider="claude",
@@ -308,9 +314,7 @@ class TestLLMClientSummarize:
 
         assert summary == "This is a summary of the content."
 
-    def test_summarize_includes_context(
-        self, mock_litellm_response: MagicMock
-    ) -> None:
+    def test_summarize_includes_context(self, mock_litellm_response: MagicMock) -> None:
         """Test summarize includes context in system prompt."""
         config = LLMConfig(
             provider="claude",
@@ -319,7 +323,9 @@ class TestLLMClientSummarize:
         )
         client = LLMClient(config)
 
-        with patch("litellm.completion", return_value=mock_litellm_response) as mock_call:
+        with patch(
+            "litellm.completion", return_value=mock_litellm_response
+        ) as mock_call:
             client.summarize("Content", context="architecture documentation")
 
             call_kwargs = mock_call.call_args[1]
@@ -337,7 +343,9 @@ class TestLLMClientSummarize:
         )
         client = LLMClient(config)
 
-        with patch("litellm.completion", return_value=mock_litellm_response) as mock_call:
+        with patch(
+            "litellm.completion", return_value=mock_litellm_response
+        ) as mock_call:
             client.summarize("Content", max_length=200)
 
             call_kwargs = mock_call.call_args[1]
@@ -360,7 +368,9 @@ class TestLLMClientCheckAvailable:
         mock_response = MagicMock()
         mock_response.choices = [MagicMock(message=MagicMock(content="ok"))]
         mock_response.model = "claude-3-sonnet-20240229"
-        mock_response.usage = MagicMock(prompt_tokens=2, completion_tokens=1, total_tokens=3)
+        mock_response.usage = MagicMock(
+            prompt_tokens=2, completion_tokens=1, total_tokens=3
+        )
 
         with patch("litellm.completion", return_value=mock_response):
             assert client.check_available() is True
@@ -415,7 +425,9 @@ class TestProviderSpecificBehavior:
     def mock_response(self) -> MagicMock:
         """Create standard mock response."""
         mock = MagicMock()
-        mock.choices = [MagicMock(message=MagicMock(content="ok"), finish_reason="stop")]
+        mock.choices = [
+            MagicMock(message=MagicMock(content="ok"), finish_reason="stop")
+        ]
         mock.model = "test-model"
         mock.usage = MagicMock(prompt_tokens=5, completion_tokens=2, total_tokens=7)
         return mock
@@ -448,7 +460,10 @@ class TestProviderSpecificBehavior:
             client.complete("Hello")
 
             call_kwargs = mock_call.call_args[1]
-            assert call_kwargs["model"] == "bedrock/anthropic.claude-3-sonnet-20240229-v1:0"
+            assert (
+                call_kwargs["model"]
+                == "bedrock/anthropic.claude-3-sonnet-20240229-v1:0"
+            )
 
     def test_claude_uses_anthropic_prefix(self, mock_response: MagicMock) -> None:
         """Test Claude client uses anthropic/ prefix for model."""

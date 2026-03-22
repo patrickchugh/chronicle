@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from orisha.analyzers.dependency import DependencyParser, DirectDependencyResolver
+from chronicle.analyzers.dependency import DependencyParser, DirectDependencyResolver
 
 
 class TestDependencyParser:
@@ -18,7 +18,8 @@ class TestDependencyParser:
     def test_parse_package_json(self, parser: DependencyParser, tmp_path: Path) -> None:
         """Test parsing package.json."""
         pkg_json = tmp_path / "package.json"
-        pkg_json.write_text('''{
+        pkg_json.write_text(
+            """{
     "name": "test-project",
     "version": "1.0.0",
     "dependencies": {
@@ -29,7 +30,8 @@ class TestDependencyParser:
         "jest": "^29.0.0",
         "typescript": "^5.0.0"
     }
-}''')
+}"""
+        )
 
         result = parser.parse_directory(tmp_path)
 
@@ -41,10 +43,13 @@ class TestDependencyParser:
         assert "express" in dep_names
         assert "lodash" in dep_names
 
-    def test_parse_requirements_txt(self, parser: DependencyParser, tmp_path: Path) -> None:
+    def test_parse_requirements_txt(
+        self, parser: DependencyParser, tmp_path: Path
+    ) -> None:
         """Test parsing requirements.txt."""
         req_file = tmp_path / "requirements.txt"
-        req_file.write_text('''
+        req_file.write_text(
+            """
 # Production dependencies
 flask==2.3.0
 sqlalchemy>=2.0
@@ -52,7 +57,8 @@ requests
 
 # Comment line
 -e git+https://github.com/user/repo.git#egg=package
-''')
+"""
+        )
 
         result = parser.parse_directory(tmp_path)
 
@@ -64,10 +70,13 @@ requests
         assert "sqlalchemy" in dep_names
         assert "requests" in dep_names
 
-    def test_parse_pyproject_toml(self, parser: DependencyParser, tmp_path: Path) -> None:
+    def test_parse_pyproject_toml(
+        self, parser: DependencyParser, tmp_path: Path
+    ) -> None:
         """Test parsing pyproject.toml."""
         pyproject = tmp_path / "pyproject.toml"
-        pyproject.write_text('''
+        pyproject.write_text(
+            """
 [project]
 name = "test-project"
 version = "1.0.0"
@@ -82,12 +91,15 @@ dev = [
     "pytest>=7.0.0",
     "ruff>=0.1.0",
 ]
-''')
+"""
+        )
 
         result = parser.parse_directory(tmp_path)
 
         # Check Python version detected (uses capitalized name)
-        py_lang = next((l for l in result.languages if l.name.lower() == "python"), None)
+        py_lang = next(
+            (l for l in result.languages if l.name.lower() == "python"), None
+        )
         assert py_lang is not None
         assert "3.11" in (py_lang.version or "")
 
@@ -99,7 +111,8 @@ dev = [
     def test_parse_go_mod(self, parser: DependencyParser, tmp_path: Path) -> None:
         """Test parsing go.mod."""
         go_mod = tmp_path / "go.mod"
-        go_mod.write_text('''
+        go_mod.write_text(
+            """
 module github.com/user/project
 
 go 1.21
@@ -112,7 +125,8 @@ require (
 require (
     golang.org/x/text v0.12.0 // indirect
 )
-''')
+"""
+        )
 
         result = parser.parse_directory(tmp_path)
 
@@ -128,7 +142,8 @@ require (
     def test_parse_pom_xml(self, parser: DependencyParser, tmp_path: Path) -> None:
         """Test parsing pom.xml."""
         pom = tmp_path / "pom.xml"
-        pom.write_text('''<?xml version="1.0" encoding="UTF-8"?>
+        pom.write_text(
+            """<?xml version="1.0" encoding="UTF-8"?>
 <project>
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.example</groupId>
@@ -153,12 +168,15 @@ require (
             <scope>test</scope>
         </dependency>
     </dependencies>
-</project>''')
+</project>"""
+        )
 
         result = parser.parse_directory(tmp_path)
 
         # Check Java version detected (uses capitalized name)
-        java_lang = next((l for l in result.languages if l.name.lower() == "java"), None)
+        java_lang = next(
+            (l for l in result.languages if l.name.lower() == "java"), None
+        )
         assert java_lang is not None
         assert java_lang.version == "17"
 
@@ -172,7 +190,8 @@ require (
     def test_parse_build_gradle(self, parser: DependencyParser, tmp_path: Path) -> None:
         """Test parsing build.gradle."""
         gradle = tmp_path / "build.gradle"
-        gradle.write_text('''
+        gradle.write_text(
+            """
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.1.0'
@@ -185,7 +204,8 @@ dependencies {
     implementation 'com.google.guava:guava:32.0.0-jre'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.0'
 }
-''')
+"""
+        )
 
         result = parser.parse_directory(tmp_path)
 
@@ -194,16 +214,20 @@ dependencies {
         assert any("spring-boot-starter-web" in name for name in dep_names)
         assert any("guava" in name for name in dep_names)
 
-    def test_framework_detection(self, parser: DependencyParser, tmp_path: Path) -> None:
+    def test_framework_detection(
+        self, parser: DependencyParser, tmp_path: Path
+    ) -> None:
         """Test framework detection from dependencies."""
         pkg_json = tmp_path / "package.json"
-        pkg_json.write_text('''{
+        pkg_json.write_text(
+            """{
     "dependencies": {
         "react": "^18.0.0",
         "react-dom": "^18.0.0",
         "next": "^13.0.0"
     }
-}''')
+}"""
+        )
 
         result = parser.parse_directory(tmp_path)
 
@@ -211,14 +235,18 @@ dependencies {
         assert "react" in fw_names
         assert "next.js" in fw_names
 
-    def test_python_framework_detection(self, parser: DependencyParser, tmp_path: Path) -> None:
+    def test_python_framework_detection(
+        self, parser: DependencyParser, tmp_path: Path
+    ) -> None:
         """Test Python framework detection."""
         req_file = tmp_path / "requirements.txt"
-        req_file.write_text('''
+        req_file.write_text(
+            """
 fastapi>=0.100.0
 uvicorn>=0.22.0
 django>=4.0.0
-''')
+"""
+        )
 
         result = parser.parse_directory(tmp_path)
 
@@ -237,9 +265,11 @@ django>=4.0.0
     def test_to_dict(self, parser: DependencyParser, tmp_path: Path) -> None:
         """Test converting result to dictionary."""
         pkg_json = tmp_path / "package.json"
-        pkg_json.write_text('''{
+        pkg_json.write_text(
+            """{
     "dependencies": {"express": "^4.18.0"}
-}''')
+}"""
+        )
 
         result = parser.parse_directory(tmp_path)
         data = result.to_dict()
@@ -258,10 +288,13 @@ class TestDirectDependencyResolver:
         """Create a DirectDependencyResolver instance."""
         return DirectDependencyResolver()
 
-    def test_parse_package_json(self, resolver: DirectDependencyResolver, tmp_path: Path) -> None:
+    def test_parse_package_json(
+        self, resolver: DirectDependencyResolver, tmp_path: Path
+    ) -> None:
         """Test parsing package.json for direct deps (T064l)."""
         pkg_json = tmp_path / "package.json"
-        pkg_json.write_text('''{
+        pkg_json.write_text(
+            """{
     "name": "test-project",
     "dependencies": {
         "express": "^4.18.0",
@@ -270,7 +303,8 @@ class TestDirectDependencyResolver:
     "devDependencies": {
         "jest": "^29.0.0"
     }
-}''')
+}"""
+        )
 
         resolver.resolve_from_directory(tmp_path)
 
@@ -285,16 +319,20 @@ class TestDirectDependencyResolver:
         assert not resolver.is_direct("accepts", "npm")
         assert not resolver.is_direct("@smithy/types", "npm")
 
-    def test_parse_requirements_txt(self, resolver: DirectDependencyResolver, tmp_path: Path) -> None:
+    def test_parse_requirements_txt(
+        self, resolver: DirectDependencyResolver, tmp_path: Path
+    ) -> None:
         """Test parsing requirements.txt for direct deps (T064m)."""
         req_file = tmp_path / "requirements.txt"
-        req_file.write_text('''
+        req_file.write_text(
+            """
 # Dependencies
 flask==2.3.0
 sqlalchemy>=2.0
 requests
 boto3==1.28.0
-''')
+"""
+        )
 
         resolver.resolve_from_directory(tmp_path)
 
@@ -308,14 +346,18 @@ boto3==1.28.0
         assert not resolver.is_direct("werkzeug", "pypi")
         assert not resolver.is_direct("botocore", "pypi")
 
-    def test_pypi_name_normalization(self, resolver: DirectDependencyResolver, tmp_path: Path) -> None:
+    def test_pypi_name_normalization(
+        self, resolver: DirectDependencyResolver, tmp_path: Path
+    ) -> None:
         """Test PyPI package name normalization."""
         req_file = tmp_path / "requirements.txt"
-        req_file.write_text('''
+        req_file.write_text(
+            """
 Flask
 SQLAlchemy
 aws-cdk-lib
-''')
+"""
+        )
 
         resolver.resolve_from_directory(tmp_path)
 
@@ -327,16 +369,20 @@ aws-cdk-lib
         assert resolver.is_direct("aws_cdk_lib", "pypi")
         assert resolver.is_direct("aws-cdk-lib", "pypi")
 
-    def test_npm_scoped_packages(self, resolver: DirectDependencyResolver, tmp_path: Path) -> None:
+    def test_npm_scoped_packages(
+        self, resolver: DirectDependencyResolver, tmp_path: Path
+    ) -> None:
         """Test npm scoped package handling (T064f)."""
         pkg_json = tmp_path / "package.json"
-        pkg_json.write_text('''{
+        pkg_json.write_text(
+            """{
     "dependencies": {
         "@aws-sdk/client-dynamodb": "^3.0.0",
         "@nestjs/core": "^10.0.0",
         "express": "^4.18.0"
     }
-}''')
+}"""
+        )
 
         resolver.resolve_from_directory(tmp_path)
 
@@ -349,15 +395,19 @@ aws-cdk-lib
         assert not resolver.is_direct("@aws-sdk/types", "npm")
         assert not resolver.is_direct("@nestjs/common", "npm")
 
-    def test_get_direct_dependencies(self, resolver: DirectDependencyResolver, tmp_path: Path) -> None:
+    def test_get_direct_dependencies(
+        self, resolver: DirectDependencyResolver, tmp_path: Path
+    ) -> None:
         """Test getting all direct dependencies for an ecosystem."""
         pkg_json = tmp_path / "package.json"
-        pkg_json.write_text('''{
+        pkg_json.write_text(
+            """{
     "dependencies": {
         "express": "^4.18.0",
         "lodash": "^4.17.0"
     }
-}''')
+}"""
+        )
 
         resolver.resolve_from_directory(tmp_path)
 
@@ -367,7 +417,9 @@ aws-cdk-lib
         assert "lodash" in direct_npm
         assert len(direct_npm) == 2
 
-    def test_multiple_ecosystems(self, resolver: DirectDependencyResolver, tmp_path: Path) -> None:
+    def test_multiple_ecosystems(
+        self, resolver: DirectDependencyResolver, tmp_path: Path
+    ) -> None:
         """Test resolving deps from multiple ecosystems."""
         # package.json
         pkg_json = tmp_path / "package.json"
@@ -375,7 +427,7 @@ aws-cdk-lib
 
         # requirements.txt
         req_file = tmp_path / "requirements.txt"
-        req_file.write_text('flask==2.3.0\n')
+        req_file.write_text("flask==2.3.0\n")
 
         resolver.resolve_from_directory(tmp_path)
 
@@ -386,7 +438,9 @@ aws-cdk-lib
         assert not resolver.is_direct("express", "pypi")
         assert not resolver.is_direct("flask", "npm")
 
-    def test_empty_directory(self, resolver: DirectDependencyResolver, tmp_path: Path) -> None:
+    def test_empty_directory(
+        self, resolver: DirectDependencyResolver, tmp_path: Path
+    ) -> None:
         """Test resolving from empty directory."""
         resolver.resolve_from_directory(tmp_path)
 

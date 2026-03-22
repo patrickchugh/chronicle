@@ -1,6 +1,6 @@
 # Sample Python Project
 
-A sample Flask application for testing Orisha documentation generation.
+A sample Flask application for testing chronicle documentation generation.
 
 ## Features
 

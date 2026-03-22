@@ -8,11 +8,11 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from orisha.config import LLMConfig, OrishaConfig, OutputConfig, ToolConfig
-from orisha.models import Repository
-from orisha.models.analysis import AuthorType
-from orisha.pipeline import AnalysisPipeline, PipelineOptions
-from orisha.utils.version import VersionTracker
+from chronicle.config import LLMConfig, chronicleConfig, OutputConfig, ToolConfig
+from chronicle.models import Repository
+from chronicle.models.analysis import AuthorType
+from chronicle.pipeline import AnalysisPipeline, PipelineOptions
+from chronicle.utils.version import VersionTracker
 
 
 class TestReproducibility:
@@ -30,16 +30,16 @@ class TestReproducibility:
         return Repository(path=tmp_path, name="test-repo")
 
     @pytest.fixture
-    def config(self) -> OrishaConfig:
+    def config(self) -> chronicleConfig:
         """Create test configuration with LLM disabled."""
-        return OrishaConfig(
+        return chronicleConfig(
             output=OutputConfig(path=Path("docs/system.md")),
             tools=ToolConfig(),
             llm=LLMConfig(enabled=False),
         )
 
     def test_consecutive_runs_produce_identical_output(
-        self, sample_repo: Repository, config: OrishaConfig
+        self, sample_repo: Repository, config: chronicleConfig
     ) -> None:
         """Test that two consecutive runs on the same repo produce identical output (T068)."""
         pipeline = AnalysisPipeline(config)
@@ -64,8 +64,14 @@ class TestReproducibility:
 
         # Source analysis should be identical
         if result1.source_analysis and result2.source_analysis:
-            assert result1.source_analysis.module_count == result2.source_analysis.module_count
-            assert result1.source_analysis.function_count == result2.source_analysis.function_count
+            assert (
+                result1.source_analysis.module_count
+                == result2.source_analysis.module_count
+            )
+            assert (
+                result1.source_analysis.function_count
+                == result2.source_analysis.function_count
+            )
 
     def test_output_comparison_utility(self) -> None:
         """Test the output comparison utility handles acceptable variations (T063)."""
@@ -120,7 +126,7 @@ class TestVersionHistory:
         )
 
         assert entry.version == "1.0.0"
-        assert entry.author == "Orisha"
+        assert entry.author == "chronicle"
         assert entry.author_type == AuthorType.AUTOMATED
         assert entry.changes == "Initial documentation"
         assert entry.timestamp is not None
@@ -199,7 +205,7 @@ class TestSBOMCompleteness:
 
     def test_canonical_package_has_license(self) -> None:
         """Test that CanonicalPackage includes license info."""
-        from orisha.models.canonical import CanonicalPackage
+        from chronicle.models.canonical import CanonicalPackage
 
         pkg = CanonicalPackage(
             name="requests",
@@ -213,7 +219,7 @@ class TestSBOMCompleteness:
 
     def test_canonical_package_has_purl(self) -> None:
         """Test that CanonicalPackage includes PURL."""
-        from orisha.models.canonical import CanonicalPackage
+        from chronicle.models.canonical import CanonicalPackage
 
         pkg = CanonicalPackage(
             name="requests",
@@ -227,7 +233,7 @@ class TestSBOMCompleteness:
 
     def test_all_dependencies_have_versions(self) -> None:
         """Test that dependencies include version information when available."""
-        from orisha.models.canonical import CanonicalPackage, CanonicalSBOM
+        from chronicle.models.canonical import CanonicalPackage, CanonicalSBOM
 
         packages = [
             CanonicalPackage(name="requests", ecosystem="pypi", version="2.31.0"),
@@ -246,7 +252,7 @@ class TestSBOMCompleteness:
 
     def test_sbom_ecosystem_grouping(self) -> None:
         """Test SBOM packages can be grouped by ecosystem."""
-        from orisha.models.canonical import CanonicalPackage, CanonicalSBOM
+        from chronicle.models.canonical import CanonicalPackage, CanonicalSBOM
 
         packages = [
             CanonicalPackage(name="requests", ecosystem="pypi", version="2.31.0"),

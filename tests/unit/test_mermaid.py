@@ -2,13 +2,13 @@
 
 import pytest
 
-from orisha.analyzers.diagrams.mermaid import (
+from chronicle.analyzers.diagrams.mermaid import (
     MAX_NODES_FULL_DETAIL,
     MAX_NODES_MODULE_LEVEL,
     MermaidGenerator,
     generate_module_flowchart,
 )
-from orisha.models.canonical.module import ImportGraph
+from chronicle.models.canonical.module import ImportGraph
 
 
 class TestMermaidGenerator:
@@ -122,7 +122,10 @@ class TestMermaidGenerator:
         # Should not contain invalid characters in IDs
         # IDs should be sanitized (no -, no ., starts with letter)
         mermaid = result.mermaid
-        assert "my_module_sub_module" in mermaid or "my-module" not in mermaid.split("[")[0]
+        assert (
+            "my_module_sub_module" in mermaid
+            or "my-module" not in mermaid.split("[")[0]
+        )
 
     def test_collapse_to_top_level(self, generator: MermaidGenerator) -> None:
         """Test collapsing nodes to top-level packages."""
@@ -136,7 +139,9 @@ class TestMermaidGenerator:
             ("pkg/a/module1", "pkg/b/module1"),
         ]
 
-        collapsed_nodes, collapsed_edges = generator._collapse_to_top_level(nodes, edges)
+        collapsed_nodes, collapsed_edges = generator._collapse_to_top_level(
+            nodes, edges
+        )
 
         # Main package (pkg) shows 2-level depth for internal structure
         assert "pkg/a" in collapsed_nodes
@@ -189,7 +194,9 @@ class TestMermaidGenerator:
         nodes = ["pkg/a", "pkg/b"]
         edges = [("pkg/a", "pkg/b")]
 
-        collapsed_nodes, collapsed_edges = generator._collapse_to_top_level(nodes, edges)
+        collapsed_nodes, collapsed_edges = generator._collapse_to_top_level(
+            nodes, edges
+        )
 
         # Both collapse to 'pkg', so edge should be removed (self-loop)
         assert len(collapsed_edges) == 0
@@ -199,7 +206,9 @@ class TestMermaidGenerator:
         nodes = ["pkg_a/module", "pkg_b/module"]
         edges = [("pkg_a/module", "pkg_b/module")]
 
-        collapsed_nodes, collapsed_edges = generator._collapse_to_top_level(nodes, edges)
+        collapsed_nodes, collapsed_edges = generator._collapse_to_top_level(
+            nodes, edges
+        )
 
         # Edge should be preserved as it crosses packages
         assert len(collapsed_edges) == 1
