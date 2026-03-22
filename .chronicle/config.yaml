@@ -14,7 +14,7 @@ tools:
 # LLM settings (REQUIRED for generating documentation summaries)
 llm:
   provider: "bedrock"
-  model: "anthropic.claude-3-sonnet-20240229-v1:0"
+  model: "us.anthropic.claude-sonnet-4-6"
   # AWS credentials loaded from environment or ~/.aws/credentials
   temperature: 0  # MUST be 0 for reproducibility (Principle II)
   max_tokens: 4096

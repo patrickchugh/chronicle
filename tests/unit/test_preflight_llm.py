@@ -194,7 +194,7 @@ class TestLLMProviderCheck:
             mock_check.assert_called_once_with("http://localhost:11434")
 
     def test_bedrock_delegates_to_bedrock_check(self) -> None:
-        """Test Bedrock provider check delegates to bedrock check."""
+        """Test Bedrock provider check delegates to bedrock check with configured model."""
         checker = PreflightChecker()
 
         with patch.object(checker, "check_bedrock") as mock_check:
@@ -204,11 +204,14 @@ class TestLLMProviderCheck:
                 message="test",
             )
 
-            checker.check_llm_provider(provider="bedrock")
+            checker.check_llm_provider(
+                provider="bedrock",
+                model="us.anthropic.claude-sonnet-4-6",
+            )
 
-            # Default Bedrock model is used when not specified
+            # Model from config is passed through
             mock_check.assert_called_once_with(
-                model="anthropic.claude-3-haiku-20240307-v1:0"
+                model="us.anthropic.claude-sonnet-4-6"
             )
 
     def test_unknown_provider(self) -> None:
@@ -244,7 +247,7 @@ class TestBedrockCheck:
             mock_response.choices = [MagicMock(message=MagicMock(content="ok"))]
             mock_completion.return_value = mock_response
 
-            result = checker.check_bedrock()
+            result = checker.check_bedrock(model="us.anthropic.claude-sonnet-4-6")
 
         assert result.available is True
         assert result.name == "bedrock"
@@ -259,7 +262,7 @@ class TestBedrockCheck:
             patch.dict("os.environ", {}, clear=True),
             patch("pathlib.Path.exists", return_value=False),
         ):
-            result = checker.check_bedrock()
+            result = checker.check_bedrock(model="us.anthropic.claude-sonnet-4-6")
 
         assert result.available is False
         assert result.name == "bedrock"
@@ -283,7 +286,7 @@ class TestBedrockCheck:
             mock_response.choices = [MagicMock(message=MagicMock(content="ok"))]
             mock_completion.return_value = mock_response
 
-            result = checker.check_bedrock()
+            result = checker.check_bedrock(model="us.anthropic.claude-sonnet-4-6")
 
         assert result.available is True
         assert "profile: default" in result.message

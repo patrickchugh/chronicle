@@ -10,6 +10,7 @@ This prevents partial/degraded results and ensures consistent, reproducible outp
 import importlib.util
 import shutil
 import subprocess
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -491,9 +492,7 @@ class PreflightChecker:
             return self.check_ollama_server(api_base or "http://localhost:11434")
 
         if provider == "bedrock":
-            # Default to Claude 3 Haiku on Bedrock for testing
-            bedrock_model = model or "anthropic.claude-3-haiku-20240307-v1:0"
-            return self.check_bedrock(model=bedrock_model)
+            return self.check_bedrock(model=model)
 
         # For Claude and Gemini, verify API key and test connectivity
         if provider == "claude":
@@ -537,7 +536,7 @@ class PreflightChecker:
         Returns:
             ToolCheck result
         """
-        test_model = model or "claude-3-haiku-20240307"
+        test_model = model
 
         try:
             import litellm
@@ -596,7 +595,7 @@ class PreflightChecker:
         Returns:
             ToolCheck result
         """
-        test_model = model or "gemini-1.5-flash"
+        test_model = model
 
         try:
             import litellm
@@ -641,7 +640,7 @@ class PreflightChecker:
                     message=f"Gemini API connection failed: {error_msg}",
                 )
 
-    def check_bedrock(self, model: str = "anthropic.claude-3-haiku-20240307-v1:0") -> ToolCheck:
+    def check_bedrock(self, model: str) -> ToolCheck:
         """Check if AWS Bedrock is available and accessible.
 
         Performs an actual API call to verify:
@@ -673,7 +672,17 @@ class PreflightChecker:
             except OSError:
                 pass
 
-        if not (has_env_key and has_env_secret) and not has_file_creds:
+        # Check for SSO configuration in ~/.aws/config
+        has_sso_config = False
+        config_path = Path.home() / ".aws" / "config"
+        if config_path.exists():
+            try:
+                config_content = config_path.read_text()
+                has_sso_config = "sso_session" in config_content or "sso_start_url" in config_content
+            except OSError:
+                pass
+
+        if not (has_env_key and has_env_secret) and not has_file_creds and not has_sso_config:
             return ToolCheck(
                 name="bedrock",
                 available=False,
@@ -809,6 +818,7 @@ class PreflightChecker:
         skip_ast: bool = False,
         skip_llm: bool = False,
         skip_repomix: bool = False,
+        on_check: Callable[[ToolCheck], None] | None = None,
     ) -> PreflightResult:
         """Run all preflight checks.
 
@@ -835,35 +845,40 @@ class PreflightChecker:
         """
         result = PreflightResult()
 
+        def _add(check: ToolCheck) -> None:
+            result.add_check(check)
+            if on_check:
+                on_check(check)
+
         # Git is always required
-        result.add_check(self.check_git(required=True))
+        _add(self.check_git(required=True))
 
         # tree-sitter is required for AST parsing (no fallback)
         if not skip_ast:
-            result.add_check(self.check_tree_sitter(required=True))
+            _add(self.check_tree_sitter(required=True))
 
         # SBOM tool
         if not skip_sbom and sbom_tool == "syft":
-            result.add_check(self.check_syft(required=True))
+            _add(self.check_syft(required=True))
 
         # Repomix for codebase compression (required for holistic LLM analysis)
         if not skip_repomix:
-            result.add_check(self.check_repomix(required=True))
+            _add(self.check_repomix(required=True))
 
         # Diagram tool - always required unless explicitly skipped
         if not skip_architecture:
             if diagram_tool == "terravision":
-                result.add_check(self.check_terravision(required=True))
-                result.add_check(self.check_graphviz(required=True))
+                _add(self.check_terravision(required=True))
+                _add(self.check_graphviz(required=True))
 
         # LLM - required for generating documentation summaries
         # Uses LiteLLM as unified interface (per research.md)
         if not skip_llm:
             # First check LiteLLM package is installed
-            result.add_check(self.check_litellm(required=True))
+            _add(self.check_litellm(required=True))
 
             # Then check provider-specific requirements with actual connectivity test
-            result.add_check(
+            _add(
                 self.check_llm_provider(
                     provider=llm_provider,
                     api_key=llm_api_key,

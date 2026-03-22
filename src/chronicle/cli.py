@@ -162,6 +162,21 @@ def check(
     llm_api_base = _config.llm.api_base if _config else "http://localhost:11434"
     llm_model = _config.llm.model if _config else None
 
+    def _print_check(check_result: "ToolCheck") -> None:
+        """Print a single check result immediately."""
+        status = "✅" if check_result.available else "❌"
+        version_str = f" ({check_result.version})" if check_result.version else ""
+        required_str = " [required]" if check_result.required else " [optional]"
+
+        typer.echo(f"  {status} {check_result.name}{version_str}{required_str}")
+        if check_result.available and check_result.path:
+            typer.echo(f"     └─ {check_result.path}")
+        elif not check_result.available:
+            typer.echo(f"     └─ {check_result.message}")
+
+    if not json_output:
+        typer.echo("\n🔍 Preflight Check Results\n")
+
     result = checker.check_all(
         repo_path=repo_path,
         sbom_tool=sbom_tool,
@@ -170,25 +185,12 @@ def check(
         llm_api_key=llm_api_key,
         llm_api_base=llm_api_base,
         llm_model=llm_model,
+        on_check=None if json_output else _print_check,
     )
 
     if json_output:
         typer.echo(json_module.dumps(result.to_dict(), indent=2))
     else:
-        # Human-readable output
-        typer.echo("\n🔍 Preflight Check Results\n")
-
-        for check_result in result.checks:
-            status = "✅" if check_result.available else "❌"
-            version_str = f" ({check_result.version})" if check_result.version else ""
-            required_str = " [required]" if check_result.required else " [optional]"
-
-            typer.echo(f"  {status} {check_result.name}{version_str}{required_str}")
-            if check_result.available and check_result.path:
-                typer.echo(f"     └─ {check_result.path}")
-            elif not check_result.available:
-                typer.echo(f"     └─ {check_result.message}")
-
         typer.echo()
 
         if result.errors:
